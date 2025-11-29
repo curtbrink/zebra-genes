@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Csp.Helpers;
 using ZebraGenes.Types;
 
 // helper funcs
@@ -70,9 +71,9 @@ List<PuzzleHint> hintList = [
 // ];
 
 //try a solve
-puzzleMatrix.SolvePuzzle(hintList);
-
-puzzleMatrix.PrintEntities();
+// puzzleMatrix.SolvePuzzle(hintList);
+//
+// puzzleMatrix.PrintEntities();
 
 // List<int> listOfInts = [1, 2, 3, 4, 5];
 // var subsets = listOfInts.GetAllSubsetsOfSize(3);
@@ -80,3 +81,13 @@ puzzleMatrix.PrintEntities();
 // {
 //     Console.WriteLine($"{subset[0]}, {subset[1]}, {subset[2]}");
 // }
+
+// test cartesian product
+List<List<int>> listOfListOfInts = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+var prod = listOfListOfInts.CartesianProduct();
+foreach (var item in prod)
+{
+    var s = item.Aggregate("", (current, i) => current + $"{i},");
+
+    Console.WriteLine($"Item: {s}");
+}
