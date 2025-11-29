@@ -7,5 +7,4 @@ public interface IConstraint<T>
     IReadOnlyList<IVariable> Scope { get; }
     
     bool IsSatisfied(IAssignment<T> assignment);
-    bool ReduceDomains(ICsp<T> csp, IDictionary<IVariable, ISet<T>> domains);
 }

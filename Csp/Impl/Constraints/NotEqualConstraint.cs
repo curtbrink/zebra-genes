@@ -1,6 +1,6 @@
 using Csp.Interfaces;
 
-namespace CspTests.ZebraTest;
+namespace Csp.Impl.Constraints;
 
 // this constraint ensures two variables have different solutions
 public class NotEqualConstraint(IVariable v1, IVariable v2) : IConstraint<string>
@@ -17,10 +17,5 @@ public class NotEqualConstraint(IVariable v1, IVariable v2) : IConstraint<string
         }
 
         return assignment.GetValue(v1) != assignment.GetValue(v2);
-    }
-
-    public bool ReduceDomains(ICsp<string> csp, IDictionary<IVariable, ISet<string>> domains)
-    {
-        throw new NotImplementedException();
     }
 }

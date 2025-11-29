@@ -10,9 +10,4 @@ public class EqualsConstraint(IVariable v, string expected) : IConstraint<string
 
     public bool IsSatisfied(IAssignment<string> assignment) =>
         assignment.IsAssigned(v) && assignment.GetValue(v) == expected;
-
-    public bool ReduceDomains(ICsp<string> csp, IDictionary<IVariable, ISet<string>> domains)
-    {
-        throw new NotImplementedException();
-    }
 }
