@@ -30,13 +30,13 @@ public class ZebraTests
         // make copies for running the thing
         var runConstraints = zebraCsp.Constraints.ToList();
         var runDomains = new Dictionary<IVariable, IDomain<string>>(zebraCsp.Domains);
-        Gac.Run(runConstraints, runDomains);
+        var solvedDomains = Gac.Run(runConstraints, runDomains);
         
         // what's the result?
-        Assert.Single(runDomains[riktus].Values);
-        Assert.Single(runDomains[psyja].Values);
-        Assert.Contains(tiger, runDomains[riktus].Values);
-        Assert.Contains(snep, runDomains[psyja].Values);
+        Assert.Single(solvedDomains[riktus].Values);
+        Assert.Single(solvedDomains[psyja].Values);
+        Assert.Contains(tiger, solvedDomains[riktus].Values);
+        Assert.Contains(snep, solvedDomains[psyja].Values);
     }
 
     [Fact]
@@ -62,13 +62,13 @@ public class ZebraTests
         
         var runConstraints = csp.Constraints.ToList();
         var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
-        Gac.Run(runConstraints, runDomains);
+        var solvedDomains = Gac.Run(runConstraints, runDomains);
         
         // what's the result?
-        AssertAnswer("A", runDomains[q1]);
-        AssertAnswer("B", runDomains[q2]);
-        AssertAnswer("E", runDomains[q3]);
-        AssertAnswer("D", runDomains[q4]);
+        AssertAnswer("A", solvedDomains[q1]);
+        AssertAnswer("B", solvedDomains[q2]);
+        AssertAnswer("E", solvedDomains[q3]);
+        AssertAnswer("D", solvedDomains[q4]);
     }
     
     [Fact]
@@ -84,11 +84,11 @@ public class ZebraTests
 
         var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
 
-        var q1Constraint = new FirstWithChoiceConstraint(allQs, q1, "E", [2, 5, 3, 4, null]);
-        var q2Constraint = new FirstWithChoiceConstraint(allQs, q2, "D", [null, 2, 3, 5, 4]);
-        var q3Constraint = new FirstWithChoiceConstraint([q2, q3, q4, q5], q3, "D", [5, 3, 2, 4, null]);
+        var q1Constraint = new FirstWithChoiceConstraint(q1, allQs, "E", [2, 5, 3, 4, null]);
+        var q2Constraint = new FirstWithChoiceConstraint(q2, allQs, "D", [null, 2, 3, 5, 4]);
+        var q3Constraint = new FirstWithChoiceConstraint(q3, [q2, q3, q4, q5], "D", [5, 3, 2, 4, null]);
         var q4Constraint = new AnswerCountConstraint(q4, allQs, "A", [3, 0, 5, 2, 4]);
-        var q5Constraint = new FirstWithChoiceConstraint([q2, q3, q4, q5], q5, "C", [null, 5, 2, 3, 4]);
+        var q5Constraint = new FirstWithChoiceConstraint(q5, [q2, q3, q4, q5], "C", [null, 5, 2, 3, 4]);
         
         List<IConstraint<string>> allConstraints = [q1Constraint, q2Constraint, q3Constraint, q4Constraint, q5Constraint];
 
@@ -96,14 +96,224 @@ public class ZebraTests
         
         var runConstraints = csp.Constraints.ToList();
         var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
-        Gac.Run(runConstraints, runDomains);
+        var solvedDomains = Gac.Run(runConstraints, runDomains);
         
         // what's the result?
-        AssertAnswer("C", runDomains[q1]);
-        AssertAnswer("A", runDomains[q2]);
-        AssertAnswer("E", runDomains[q3]);
-        AssertAnswer("A", runDomains[q4]);
-        AssertAnswer("A", runDomains[q5]);
+        AssertAnswer("C", solvedDomains[q1]);
+        AssertAnswer("A", solvedDomains[q2]);
+        AssertAnswer("E", solvedDomains[q3]);
+        AssertAnswer("A", solvedDomains[q4]);
+        AssertAnswer("A", solvedDomains[q5]);
+    }
+    
+    [Fact]
+    public void TestSelfReferencingMedium()
+    {
+        var questions = new List<IOrderedVariable>();
+        for (var i = 1; i <= 8; i++)
+        {
+            questions.Add(new OrderedVariable($"Q{i}", i));
+        }
+
+        var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
+
+        var constraints = new List<IConstraint<string>>
+        {
+            // notes:
+            // - FirstWithChoiceConstraint can take an optional boolean indicating "last with answer X" instead of "first"
+            // - FirstWithChoiceConstraint can take a subset of questions, to ask e.g. "Which is the first question after Q2 with answer X?"
+            // - OnlyConsecutiveSameConstraint asks "What is the only pair of consecutive questions with the same answer?"
+            // - questions[] here is 0-indexed. choiceList[] (the list passed to the constraint constructor) refers to question number.
+            //   -> constraint code handles this conversion.
+            // - "null" in a choiceList[] means:
+            //   -> FirstWithChoiceConstraint -> there are no questions with this answer in the Scope.
+            //   -> MostLeastCommonConstraint -> there is a tie for most or least common.
+            
+            // Q1: Which is the first question with answer B?
+            new FirstWithChoiceConstraint(questions[0], questions, "B", [5, 6, 8, 2, 1]),
+            // Q2: What is the answer to Q5?
+            new ChoiceEqualsConstraint(questions[1], questions[4], ["E", "A", "B", "D", "C"]),
+            // Q3: Which is the last question with answer C?
+            new FirstWithChoiceConstraint(questions[2], questions, "C", [8, 1, 7, null, 2], true),
+            // Q4: Which is the last question with answer D?
+            new FirstWithChoiceConstraint(questions[3], questions, "D", [6, 8, 1, 2, null], true),
+            // Q5: Which is the first question with answer E?
+            new FirstWithChoiceConstraint(questions[4], questions, "E", [8, 4, 5, null, 6]),
+            // Q6: How many questions have answer A?
+            new AnswerCountConstraint(questions[5], questions, "A", [4, 3, 2, 0, 7]),
+            // Q7: Which are the only two consecutive questions with the same answer?
+            // e.g. A = 5 and 6 have the same answer, and no other adjacent pair of questions in the puzzle has the same answer as each other
+            new OnlyConsecutiveSameConstraint(questions[6], questions, [[5, 6], [4, 5], [3, 4], [1, 2], [2, 3]]),
+            // Q8: Which is the least common answer?
+            new MostLeastCommonConstraint(questions[7], questions, ["E", "A", "D", null, "C"], true)
+        };
+        
+        var csp = new UniformDomainCsp<string>(questions, domain, constraints);
+        
+        var runConstraints = csp.Constraints.ToList();
+        var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
+        
+        // knock out all the direct logical offenders first
+        var workingDomains = Gac.Run(runConstraints, runDomains);
+
+        // now use search to find our solution
+        var solvedDomains = Gac.RunWithBacktrackingSearch(runConstraints, workingDomains);
+        
+        // solving without checking first! :o
+        foreach (var d in solvedDomains.Values)
+        {
+            Assert.Single(d.Values);
+        }
+        
+        // ok so this is the point where we'd require some search and backtracking.
+        // GAC alone was only able to rule out 2 choices on 3 questions, 1 choice on 3 questions, none on the other 2.
+    }
+
+    [Fact]
+    public void AnotherSelfRefVeryEasyTest()
+    {
+        var questions = new List<IOrderedVariable>();
+        for (var i = 1; i <= 4; i++)
+        {
+            questions.Add(new OrderedVariable($"Q{i}", i));
+        }
+
+        var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
+
+        var constraints = new List<IConstraint<string>>
+        {
+            // Q1: What is the answer to Q2?
+            new ChoiceEqualsConstraint(questions[0], questions[1], ["B", "C", "D", "A", "E"]),
+            // Q2: How many questions are answer C?
+            new AnswerCountConstraint(questions[1], questions, "C", [0, 2, 4, 1, 3]),
+            // Q3: What is the answer to Q1?
+            new ChoiceEqualsConstraint(questions[2], questions[0], ["A", "E", "B", "D", "C"]),
+            // Q4: How many questions are answer A?
+            new AnswerCountConstraint(questions[3], questions, "A", [0, 1, 4, 2, 3])
+        };
+        
+        var csp = new UniformDomainCsp<string>(questions, domain, constraints);
+        
+        var runConstraints = csp.Constraints.ToList();
+        var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
+        
+        // knock out all the direct logical offenders first
+        var workingDomains = Gac.Run(runConstraints, runDomains);
+
+        // now use search to find our solution
+        var solvedDomains = Gac.RunWithBacktrackingSearch(runConstraints, workingDomains);
+        
+        // solving without checking first! :o
+        foreach (var d in solvedDomains.Values)
+        {
+            Assert.Single(d.Values);
+        }
+    }
+    
+    [Fact]
+    public void TestSelfReferencingHard()
+    {
+        var questions = new List<IOrderedVariable>();
+        for (var i = 1; i <= 10; i++)
+        {
+            questions.Add(new OrderedVariable($"Q{i}", i));
+        }
+
+        var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
+
+        var constraints = new List<IConstraint<string>>
+        {
+            // Q1: Which is the last question with answer D?
+            new FirstWithChoiceConstraint(questions[0], questions, "D", [null, 6, 9, 4, 3], true),
+            // Q2: How many questions are answer D?
+            new AnswerCountConstraint(questions[1], questions, "D", [6, 0, 1, 3, 10]),
+            // Q3: Which is the least common answer?
+            new MostLeastCommonConstraint(questions[2], questions, ["E", null, "C", "A", "D"], true),
+            // Q4: How many questions are answer E?
+            new AnswerCountConstraint(questions[3], questions, "E", [4, 0, 8, 6, 1]),
+            // Q5: Which is the last question with answer A?
+            new FirstWithChoiceConstraint(questions[4], questions, "A", [10, 3, 1, 5, 9], true),
+            // Q6: How many questions are answer B?
+            new AnswerCountConstraint(questions[5], questions, "B", [0, 6, 3, 4, 1]),
+            // Q7: What is the answer to Q4?
+            new ChoiceEqualsConstraint(questions[6], questions[3], ["E", "D", "B", "C", "A"]),
+            // Q8: Which is the last question before Q9 with answer B?
+            new FirstWithChoiceConstraint(questions[7], questions[..8], "B", [8, 4, 5, 2, 3], true),
+            // Q9: How many questions are answer A?
+            new AnswerCountConstraint(questions[8], questions, "A", [6, 1, 0, 3, 4]),
+            // Q10: Which is the first question with answer E?
+            new FirstWithChoiceConstraint(questions[9], questions, "E", [3, 1, null, 2, 4])
+        };
+        
+        var csp = new UniformDomainCsp<string>(questions, domain, constraints);
+        
+        var runConstraints = csp.Constraints.ToList();
+        var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
+        
+        // knock out all the direct logical offenders first
+        var workingDomains = Gac.Run(runConstraints, runDomains);
+
+        // now use search to find our solution
+        var solvedDomains = Gac.RunWithBacktrackingSearch(runConstraints, workingDomains);
+        
+        // solving without checking first! :o
+        foreach (var d in solvedDomains.Values)
+        {
+            Assert.Single(d.Values);
+        }
+    }
+
+    [Fact]
+    public void MinZebraIsSoHawdUghhhh()
+    {
+        var questions = new List<IOrderedVariable>();
+        for (var i = 1; i <= 5; i++)
+        {
+            questions.Add(new OrderedVariable($"Couple{i}", i));
+        }
+
+        var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
+
+        var constraints = new List<IConstraint<string>>
+        {
+            // Q1: Which is the last question with answer D?
+            new FirstWithChoiceConstraint(questions[0], questions, "D", [null, 6, 9, 4, 3], true),
+            // Q2: How many questions are answer D?
+            new AnswerCountConstraint(questions[1], questions, "D", [6, 0, 1, 3, 10]),
+            // Q3: Which is the least common answer?
+            new MostLeastCommonConstraint(questions[2], questions, ["E", null, "C", "A", "D"], true),
+            // Q4: How many questions are answer E?
+            new AnswerCountConstraint(questions[3], questions, "E", [4, 0, 8, 6, 1]),
+            // Q5: Which is the last question with answer A?
+            new FirstWithChoiceConstraint(questions[4], questions, "A", [10, 3, 1, 5, 9], true),
+            // Q6: How many questions are answer B?
+            new AnswerCountConstraint(questions[5], questions, "B", [0, 6, 3, 4, 1]),
+            // Q7: What is the answer to Q4?
+            new ChoiceEqualsConstraint(questions[6], questions[3], ["E", "D", "B", "C", "A"]),
+            // Q8: Which is the last question before Q9 with answer B?
+            new FirstWithChoiceConstraint(questions[7], questions[..8], "B", [8, 4, 5, 2, 3], true),
+            // Q9: How many questions are answer A?
+            new AnswerCountConstraint(questions[8], questions, "A", [6, 1, 0, 3, 4]),
+            // Q10: Which is the first question with answer E?
+            new FirstWithChoiceConstraint(questions[9], questions, "E", [3, 1, null, 2, 4])
+        };
+        
+        var csp = new UniformDomainCsp<string>(questions, domain, constraints);
+        
+        var runConstraints = csp.Constraints.ToList();
+        var runDomains = new Dictionary<IVariable, IDomain<string>>(csp.Domains);
+        
+        // knock out all the direct logical offenders first
+        var workingDomains = Gac.Run(runConstraints, runDomains);
+
+        // now use search to find our solution
+        var solvedDomains = Gac.RunWithBacktrackingSearch(runConstraints, workingDomains);
+        
+        // solving without checking first! :o
+        foreach (var d in solvedDomains.Values)
+        {
+            Assert.Single(d.Values);
+        }
     }
 
     private static void AssertAnswer(string expected, IDomain<string> domain)

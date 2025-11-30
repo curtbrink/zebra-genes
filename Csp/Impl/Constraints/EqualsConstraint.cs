@@ -2,12 +2,12 @@ using Csp.Interfaces;
 
 namespace Csp.Impl.Constraints;
 
-public class EqualsConstraint(IVariable v, string expected) : IConstraint<string>
+public class EqualsConstraint(IVariable owner, string expected) : IConstraint<string>
 {
     public string Name => "Equals";
-    public string Description => $"{v.Name} == \"{expected}\"";
-    public IReadOnlyList<IVariable> Scope { get; } = [v];
+    public string Description => $"{owner.Name} == \"{expected}\"";
+    public IReadOnlyList<IVariable> Scope { get; } = [owner];
 
-    public bool IsSatisfied(IAssignment<string> assignment) =>
-        assignment.IsAssigned(v) && assignment.GetValue(v) == expected;
+    public bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains) =>
+        v == owner ? val == expected : domains[v].Values.Contains(expected);
 }

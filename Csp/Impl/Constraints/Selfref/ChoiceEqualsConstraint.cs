@@ -8,13 +8,16 @@ public class ChoiceEqualsConstraint(IVariable owner, IVariable lookingAt, IEnume
     public override string Name => "ChoiceEquals";
     public override string Description => $"{owner.Name}=>{lookingAt.Name} is {{{OptionString}}}";
 
-    public override bool IsSatisfied(IAssignment<string> assignment)
+    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        if (!assignment.IsAssigned(owner) || !assignment.IsAssigned(lookingAt))
+        // owner's choice is val
+        if (v == owner)
         {
-            return false;
+            var lookingAtMustBe = ChoiceList[val];
+            return domains[lookingAt].Values.Contains(lookingAtMustBe);
         }
-
-        return ChoiceList[assignment.GetValue(owner)] == assignment.GetValue(lookingAt);
+        // lookingAt's choice is val
+        var ownerMustBe = ChoiceList.Keys.FirstOrDefault(k => ChoiceList[k] == val);
+        return ownerMustBe != null && domains[owner].Values.Contains(ownerMustBe);
     }
 }

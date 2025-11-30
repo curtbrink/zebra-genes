@@ -3,12 +3,80 @@ using Csp.Interfaces;
 
 namespace Csp.Impl;
 
+public class ContradictionException(string message) : Exception(message);
+
 public static class Gac
 {
     // Arc consistency runner.
     //    ...GAC is pretty goated, if a bit computationally expensive. With the sauce, even.
 
-    public static void Run<T>(ICollection<IConstraint<T>> constraints, IDictionary<IVariable, IDomain<T>> domains)
+    public static IDictionary<IVariable, IDomain<T>> RunWithBacktrackingSearch<T>(ICollection<IConstraint<T>> constraints,
+        IDictionary<IVariable, IDomain<T>> domains)
+    {
+        // recursively 
+        // base case: solved puzzle
+        if (domains.Values.All(v => v.Values.Count == 1))
+        {
+            return domains;
+        }
+        
+        // else pick the "closest to solve" => question with fewest remaining choices (MRV)
+        // then try each value, run a GAC, and recurse.
+        // if we never find a contradiction we know we have a good solution that we bubble up to the top.
+        var minDomainSize = domains.Values.Min(v => v.Values.Count == 1 ? int.MaxValue : v.Values.Count);
+        var firstVariableWithMin = domains.Keys.First(k => domains[k].Values.Count == minDomainSize);
+
+        var firstVariableDomain = domains[firstVariableWithMin];
+
+        foreach (var vValue in firstVariableDomain.Values.ToList())
+        {
+            Console.WriteLine($"[SEARCH] Looking for possible solutions with {firstVariableWithMin.Name}={vValue} ...");
+            var domainCopy = DeepCopyDomains(domains);
+            
+            // hard set that question's choice to vValue
+            domainCopy[firstVariableWithMin] = new Domain<T>([vValue]);
+
+            try
+            {
+                // GAC to stable. this will throw a ContradictionException if our hypothetical choice
+                // directly propagates to a contradiction.
+                Run(constraints, domainCopy);
+
+                // we now either have a complete solution or a partial solution without contradictions.
+                // recurse to get to a complete solution (the only base case).
+                // this call will throw a ContradictionException if our search doesn't find any valid solutions
+                // that include our partial solution.
+                var result = RunWithBacktrackingSearch<T>(constraints, domainCopy);
+
+                // ladies and gentlemen...we got 'em
+                // if we're still here, congrats! it's a full solution.
+                return result;
+            }
+            catch (ContradictionException ce)
+            {
+                // our hypothetical partial solution didn't yield any full solutions.
+                Console.WriteLine(ce.Message);
+                continue;
+            }
+        }
+        
+        // no option for this variable yielded a good solution.
+        Console.WriteLine($"[SEARCH] No valid solutions found for {firstVariableWithMin.Name} here!");
+        throw new ContradictionException($"Could not find a valid solution for {firstVariableWithMin.Name}");
+    }
+
+    private static IDictionary<IVariable, IDomain<T>> DeepCopyDomains<T>(IDictionary<IVariable, IDomain<T>> domains)
+    {
+        var newDict = new Dictionary<IVariable, IDomain<T>>();
+        foreach (var v in domains.Keys)
+        {
+            newDict[v] = new Domain<T>(domains[v].Values.ToList());
+        }
+
+        return newDict;
+    }
+
+    public static IDictionary<IVariable, IDomain<T>> Run<T>(ICollection<IConstraint<T>> constraints, IDictionary<IVariable, IDomain<T>> domains)
     {
         var queue = new Queue<(IConstraint<T>, IVariable)>();
 
@@ -36,7 +104,7 @@ public static class Gac
             // quick contradiction check - variable still needs a possible solution
             if (domains[variable].Values.Count == 0)
             {
-                throw new Exception($"Contradiction found - {variable.Name} no longer has a valid solution");
+                throw new ContradictionException($"Contradiction found - {variable.Name} no longer has a valid solution");
             }
             
             // enqueue neighbors - (Ci, N) where Ci contains variable in its scope.
@@ -48,6 +116,8 @@ public static class Gac
                 }
             }
         }
+
+        return domains;
     }
 
     private static bool Revise<T>(IConstraint<T> constraint, IVariable variable, IDictionary<IVariable, IDomain<T>> domains)
@@ -55,34 +125,33 @@ public static class Gac
         // return value - if we change v's domain, we let the runner know so it rechecks affected constraints.
         var somethingChanged = false;
 
-        // we want all remaining possible combos of solutions for relevant variables.
-        var otherVariables = constraint.Scope.Where(v => v != variable).ToList();
-        var otherVariableTuples = otherVariables.Select(v => domains[v].Values).CartesianProduct().ToList();
-
-        foreach (var xValue in domains[variable].Values.ToList()) // copy because we may mutate
+        List<T> xValuesToTry = [.. domains[variable].Values];
+        foreach (var xValue in xValuesToTry) // copy because we may mutate
         {
             // is there a possible scenario right now where xValue is valid?
-            var hasSupport = false;
-            
-            foreach (var possibleState in otherVariableTuples)
-            {
-                var assignment = new Assignment<T>(variable, xValue, otherVariables, possibleState.ToList());
-                if (constraint.IsSatisfied(assignment))
-                {
-                    hasSupport = true;
-                    break;
-                }
-            }
-            
-            if (!hasSupport)
+            if (!constraint.IsSatisfiable(variable, xValue, domains))
             {
                 Console.WriteLine(
-                    $"[debug] Checking v=[{variable.Name}] for c=[{constraint.Name}], desc=[{constraint.Description}] -> determined value {xValue} has no support");
+                    $"[debug] Checking v=[{variable.Name}] for c=[{constraint.Name}], desc=[{constraint.Description}]");
+                Console.WriteLine($" -> determined value {xValue} has no support");
                 domains[variable].Values.Remove(xValue);
+                
+                // pretty print domains at this point
+                Console.WriteLine($"[debug] new domains => {PrettyPrintDomains(domains)}");
                 somethingChanged = true;
             }
         }
         
         return somethingChanged;
+    }
+
+    private static string PrettyPrintDomains<T>(IDictionary<IVariable, IDomain<T>> domains)
+    {
+        var domainStrings = domains.Keys.Select(k => (k, domains[k].Values.ToList()))
+            .ToDictionary(p => p.k, p => p.Item2);
+        var domainPrettied =
+            string.Join(" ",
+                domainStrings.Keys.Select(k => $"{k.Name}={{{string.Join("", domainStrings[k])}}}"));
+        return domainPrettied;
     }
 }

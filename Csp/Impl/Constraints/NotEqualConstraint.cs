@@ -9,13 +9,10 @@ public class NotEqualConstraint(IVariable v1, IVariable v2) : IConstraint<string
     public string Description => $"{v1.Name} != {v2.Name}";
     public IReadOnlyList<IVariable> Scope { get; } = [v1, v2];
 
-    public bool IsSatisfied(IAssignment<string> assignment)
+    public bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        if (!assignment.IsAssigned(v1) || !assignment.IsAssigned(v2))
-        {
-            return false;
-        }
-
-        return assignment.GetValue(v1) != assignment.GetValue(v2);
+        return v == v1
+            ? domains[v2].Values.Any(otherVal => otherVal != val)
+            : domains[v1].Values.Any(otherVal => otherVal != val);
     }
 }

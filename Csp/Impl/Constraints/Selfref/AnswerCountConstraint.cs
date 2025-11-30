@@ -12,15 +12,36 @@ public class AnswerCountConstraint(
     public override string Name => "CountOf";
     public override string Description => $"count({toCount}) is {owner.Name}=>{{{OptionString}}}";
 
-    public override bool IsSatisfied(IAssignment<string> assignment)
+    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        if (!assignment.IsAssigned(owner))
+        // unlike most/least common which is much more complex, we just want to know if count(j) can be hit.
+        var optionsToCheck = v == owner ? [val] : domains[owner].Values.ToList();
+        var min = 0;
+        var max = 0;
+        foreach (var question in Scope)
         {
-            return false;
+            if (question == v)
+            {
+                if (val == toCount)
+                {
+                    min++;
+                    max++;
+                }
+
+                continue;
+            }
+
+            if (domains[question].Values.Contains(toCount))
+            {
+                max++;
+                if (domains[question].Values.Count == 1)
+                {
+                    // assigned!
+                    min++;
+                }
+            }
         }
 
-        var ownerChoice = assignment.GetValue(owner);
-        return ChoiceList[ownerChoice] ==
-               Scope.Count(v => assignment.IsAssigned(v) && assignment.GetValue(v) == toCount);
+        return optionsToCheck.Any(o => ChoiceList[o] >= min && ChoiceList[o] <= max);
     }
 }

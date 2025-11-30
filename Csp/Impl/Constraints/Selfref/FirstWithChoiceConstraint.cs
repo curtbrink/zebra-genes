@@ -9,49 +9,70 @@ namespace Csp.Impl.Constraints.Selfref;
 // closest X before #Y -> same as closest after, with same narrower scope and questions reversed
 
 public class FirstWithChoiceConstraint(
-    IEnumerable<IOrderedVariable> scope,
     IOrderedVariable owner,
+    IEnumerable<IOrderedVariable> rangeToCheck,
     string expected,
     IEnumerable<int?> choiceList,
-    bool isReverse = false) : BaseSelfRefConstraint<int?>(scope, choiceList)
+    bool isReverse = false) : BaseSelfRefConstraint<int?>(rangeToCheck.Contains(owner) ? rangeToCheck : [..rangeToCheck, owner], choiceList)
 {
     public override string Name => "FirstWithChoice";
     public override string Description => $"First Q with choice {expected} is {owner.Name}=>{{{OptionString}}}";
 
     private readonly Comparison<IOrderedVariable> _comparer = isReverse ? (a, b) => b.Id - a.Id : (a, b) => a.Id - b.Id;
 
+    private readonly List<IOrderedVariable> _window = rangeToCheck.ToList();
     
-    public override bool IsSatisfied(IAssignment<string> assignment)
+    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        if (!assignment.IsAssigned(owner))
-        {
-            return false;
-        }
+        // make sure we have a sort
+        _window.Sort(_comparer);
 
-        var firstQWithChoice = ChoiceList[assignment.GetValue(owner)];
-        
-        // make sure we sort just in case
-        var sortedVs = scope.ToList();
-        sortedVs.Sort(_comparer);
+        var firstsToCheck = v == owner ? [ChoiceList[val]] : domains[owner].Values.Select(o => ChoiceList[o]).ToList();
 
-        foreach (var v in sortedVs)
+        foreach (var firstQId in firstsToCheck)
         {
-            // did we go too far?
-            if (firstQWithChoice is not null && (isReverse ? v.Id < firstQWithChoice : v.Id > firstQWithChoice))
+            if (firstQId == null)
             {
-                return false;
+                // check that every Q can be assigned to not expected
+                if (_window.All(q => (q == v ? [val] : domains[q].Values.ToList()).Any(o => o != expected)))
+                {
+                    // found one
+                    return true;
+                }
+
+                // not supported
+                continue;
             }
             
-            if (assignment.IsAssigned(v))
+            // can firstQId be the first?
+            var targetIdx = _window.FindIndex(q => q.Id == firstQId);
+            var targetQ = _window[targetIdx];
+
+            var targetQDomain = targetQ == v ? [val] : domains[targetQ].Values.ToList();
+            if (!targetQDomain.Contains(expected))
             {
-                if (assignment.GetValue(v) == expected)
+                continue; // not supported if it can't even be that option
+            }
+            
+            // now it is supported if there isn't a forced expected before it.
+            var supported = true;
+            for (var i = 0; i < targetIdx; i++)
+            {
+                var qi =  _window[i];
+                var qiDomain = qi == v ? [val] :  domains[qi].Values.ToList();
+                if (qiDomain.Count == 1 && qiDomain[0] == expected)
                 {
-                    return v.Id == firstQWithChoice;
+                    supported = false;
+                    break;
                 }
+            }
+
+            if (supported)
+            {
+                return true;
             }
         }
 
-        // didn't find an expected choice!
-        return firstQWithChoice is null;
+        return false;
     }
 }

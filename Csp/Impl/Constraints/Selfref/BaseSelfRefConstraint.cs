@@ -1,3 +1,4 @@
+using System.Collections;
 using Csp.Interfaces;
 
 namespace Csp.Impl.Constraints.Selfref;
@@ -7,9 +8,11 @@ public abstract class BaseSelfRefConstraint<T> : IConstraint<string>
 {
     protected readonly IList<string> Options = ["A", "B", "C", "D", "E"];
     protected readonly IDictionary<string, T> ChoiceList;
-    
-    protected string OptionString => string.Join("|", ChoiceList.Keys.Select(k => $"{k}={ChoiceList[k]}"));
 
+    protected string OptionString => string.Join("|", OptionListItems);
+
+    private List<string> OptionListItems =>
+        ChoiceList.Keys.Select(k => $"{k}={(ChoiceList[k] is null ? "None" : ChoiceList[k])}").ToList();
     
     public abstract string Name { get; }
     public abstract string Description { get; }
@@ -26,5 +29,5 @@ public abstract class BaseSelfRefConstraint<T> : IConstraint<string>
         }
     }
 
-    public abstract bool IsSatisfied(IAssignment<string> assignment);
+    public abstract bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains);
 }
