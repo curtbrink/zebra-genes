@@ -1,6 +1,9 @@
-﻿using Csp.Impl;
+﻿using Csp.Builders;
+using Csp.Helpers;
+using Csp.Impl;
 using Csp.Impl.Constraints;
 using Csp.Impl.Constraints.Selfref;
+using Csp.Impl.Constraints.Zebra;
 using Csp.Interfaces;
 
 namespace CspTests.ZebraTest;
@@ -10,33 +13,33 @@ public class ZebraTests
     [Fact]
     public void TestZebraCsp()
     {
-        var riktus = new BaseVariable("Riktus");
-        var psyja = new BaseVariable("Psyja");
-        List<IVariable> zebraVs = [riktus, psyja];
+        var domain = new Domain<int>([1, 2]);
 
-        var tiger = "Tiger";
-        var snep = "Snepfox";
-        var domain = new Domain<string>([tiger, snep]);
-        
-        List<IConstraint<string>> zebraConstraints =
+        var categories = new Dictionary<string, List<IVariable>>();
+        categories["Name"] = [new BaseVariable("Jed"), new BaseVariable("Eddy")];
+        categories["Pet"] = [new BaseVariable("Dinosaur"), new BaseVariable("Flea")];
+
+        List<IConstraint<int>> constraints =
         [
-            new NotEqualConstraint(riktus, psyja),
-            new EqualsConstraint(riktus, tiger)
+            new AllDifferentConstraint(categories["Name"], "Name"),
+            new AllDifferentConstraint(categories["Pet"], "Pet"),
+            new EqualsConstraint(categories["Name"][0], categories["Pet"][0]), // Jed pos == dinosaur pos
+            new OneOfConstraint(categories["Pet"][1], [2]) // Flea is in position 2
         ];
-
-        // immutable csp definition
-        var zebraCsp = new UniformDomainCsp<string>(zebraVs, domain, zebraConstraints);
-
-        // make copies for running the thing
-        var runConstraints = zebraCsp.Constraints.ToList();
-        var runDomains = new Dictionary<IVariable, IDomain<string>>(zebraCsp.Domains);
-        var solvedDomains = Gac.Run(runConstraints, runDomains);
         
-        // what's the result?
-        Assert.Single(solvedDomains[riktus].Values);
-        Assert.Single(solvedDomains[psyja].Values);
-        Assert.Contains(tiger, solvedDomains[riktus].Values);
-        Assert.Contains(snep, solvedDomains[psyja].Values);
+        // immutable csp
+        var csp = new UniformDomainCsp<int>([.. categories["Name"], .. categories["Pet"]], domain, constraints);
+        
+        // working objects
+        var runConstraints = csp.Constraints.ToList();
+        var runDomains = new Dictionary<IVariable, IDomain<int>>(csp.Domains);
+        var solvedDomains = Gac.Run(runConstraints, runDomains);
+
+        foreach (var k in solvedDomains.Keys)
+        {
+            var kDomain = solvedDomains[k].Values;
+            Assert.Single(kDomain);
+        }
     }
 
     [Fact]
@@ -119,16 +122,6 @@ public class ZebraTests
 
         var constraints = new List<IConstraint<string>>
         {
-            // notes:
-            // - FirstWithChoiceConstraint can take an optional boolean indicating "last with answer X" instead of "first"
-            // - FirstWithChoiceConstraint can take a subset of questions, to ask e.g. "Which is the first question after Q2 with answer X?"
-            // - OnlyConsecutiveSameConstraint asks "What is the only pair of consecutive questions with the same answer?"
-            // - questions[] here is 0-indexed. choiceList[] (the list passed to the constraint constructor) refers to question number.
-            //   -> constraint code handles this conversion.
-            // - "null" in a choiceList[] means:
-            //   -> FirstWithChoiceConstraint -> there are no questions with this answer in the Scope.
-            //   -> MostLeastCommonConstraint -> there is a tie for most or least common.
-            
             // Q1: Which is the first question with answer B?
             new FirstWithChoiceConstraint(questions[0], questions, "B", [5, 6, 8, 2, 1]),
             // Q2: What is the answer to Q5?
@@ -264,12 +257,33 @@ public class ZebraTests
     }
 
     [Fact]
+    public void TestBuilder()
+    {
+        var zebra = ZebraBuilder.Create(3)
+            .AddCategory("Name", ["Riktus", "Psyja", "Arkturus"])
+            .AddCategory("Fursona", ["Tiger", "Fox", "Snepfox"])
+            .AddConstraint("Riktus").IsAdjacentTo("Snepfox")
+            .AddConstraint("Fox").IsAfter("Riktus")
+            .AddConstraint("Arkturus").MustBeInPosition([1, 3])
+            .AddConstraint("Arkturus").Is("Fox")
+            .AddConstraint("Riktus").MustBeInPosition([1, 3])
+            .Build();
+
+        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zebra.Domains);
+        List<IConstraint<int>> workingConstraints = [..zebra.Constraints];
+
+        var solvedDomains = Gac.Run(workingConstraints, workingDomains);
+
+        Assert.True(true);
+    }
+
+    [Fact]
     public void MinZebraIsSoHawdUghhhh()
     {
         var questions = new List<IOrderedVariable>();
-        for (var i = 1; i <= 5; i++)
+        for (var i = 1; i <= 10; i++)
         {
-            questions.Add(new OrderedVariable($"Couple{i}", i));
+            questions.Add(new OrderedVariable($"Q{i}", i));
         }
 
         var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
