@@ -43,7 +43,7 @@ public class ZebraTests
     [Fact]
     public void TestBuilder()
     {
-        var zebra = ZebraBuilder.Create(3)
+        var (zebra, _) = ZebraBuilder.Create(3)
             .AddCategory("Name", ["Riktus", "Psyja", "Arkturus"])
             .AddCategory("Fursona", ["Tiger", "Fox", "Snepfox"])
             .AddConstraint("Riktus").IsAdjacentTo("Snepfox")
@@ -64,7 +64,7 @@ public class ZebraTests
     [Fact]
     public void TestZebraBuilder1()
     {
-        var zb = ZebraBuilder.Create(4)
+        var (zb, _) = ZebraBuilder.Create(4)
             .AddCategory("Shirt", ["black", "green", "orange", "purple"])
             .AddCategory("Name", ["Carl", "Frank", "Henry", "Victor"])
             .AddCategory("Flower", ["daisy", "fern", "hydrangea", "lily"])
@@ -93,7 +93,7 @@ public class ZebraTests
     [Fact]
     public void TestZebraBuilder5()
     {
-        var zb = ZebraBuilder.Create(5)
+        var (zb, _) = ZebraBuilder.Create(5)
             .AddCategory("Shirt", ["black", "pink", "red", "white", "yellow"])
             .AddCategory("Name", ["Brian", "Jonathan", "Mark", "Samuel", "Ulysses"])
             .AddCategory("Symptom", ["pain", "dizziness", "fever", "throat", "stomach"])

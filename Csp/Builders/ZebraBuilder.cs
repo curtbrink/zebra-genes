@@ -48,7 +48,8 @@ public class ZebraBuilder
         return new ZebraConstraintBuilder(this, variable);
     }
 
-    public UniformDomainCsp<int> Build() => new (_variables, _domain, _constraints);
+    public (UniformDomainCsp<int>, Dictionary<string, List<string>>) Build() =>
+        (new UniformDomainCsp<int>(_variables, _domain, _constraints), _categories);
 
     protected IVariable GetVariable(string name)
     {
