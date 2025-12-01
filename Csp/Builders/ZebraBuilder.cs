@@ -134,7 +134,9 @@ public class ZebraBuilder
         private ZebraBuilder IsNBefore(string other, int n, bool reverse)
         {
             var otherVar = _builder.GetVariable(other);
-            var constraint = new OffsetConstraint(_primary, otherVar, n);
+            var before = reverse ? otherVar : _primary;
+            var after = reverse ? _primary : otherVar;
+            var constraint = new OffsetConstraint(before, after, n);
             return AddAndClose(constraint);
         }
 

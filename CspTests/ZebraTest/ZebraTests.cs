@@ -409,6 +409,78 @@ public class ZebraTests
         var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
     }
 
+    [Fact]
+    public void TestZebraBuilder1()
+    {
+        var zb = ZebraBuilder.Create(4)
+            .AddCategory("Shirt", ["black", "green", "orange", "purple"])
+            .AddCategory("Name", ["Carl", "Frank", "Henry", "Victor"])
+            .AddCategory("Flower", ["daisy", "fern", "hydrangea", "lily"])
+            .AddCategory("Arrangement", ["cascading", "even", "layered", "row"])
+            .AddConstraint("even").MustBeInPosition(3)
+            .AddConstraint("daisy").MustBeInPosition(2)
+            .AddConstraint("orange").IsBefore("Frank")
+            .AddConstraint("Henry").Has("hydrangea")
+            .AddConstraint("Victor").Is("black")
+            .AddConstraint("green").Is("cascading")
+            .AddConstraint("Frank").Has("fern")
+            .AddConstraint("Frank").MustBeInPosition([1, 4])
+            .AddConstraint("black").Is("row")
+            .AddConstraint("orange").Is("layered")
+            .AddConstraint("lily").MustBeInPosition(3)
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zb.Domains);
+        var workingConstraints = zb.Constraints.ToList();
+        
+        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
+
+        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+    }
+    
+    [Fact]
+    public void TestZebraBuilder5()
+    {
+        var zb = ZebraBuilder.Create(5)
+            .AddCategory("Shirt", ["black", "pink", "red", "white", "yellow"])
+            .AddCategory("Name", ["Brian", "Jonathan", "Mark", "Samuel", "Ulysses"])
+            .AddCategory("Symptom", ["pain", "dizziness", "fever", "throat", "stomach"])
+            .AddCategory("Waiting", ["10min", "25min", "30min", "40min", "45min"])
+            .AddCategory("Phone", ["Astrus", "Motoralo", "Sumsang", "Toshina", "Xiamio"])
+            .AddCategory("Profession", ["baker", "DJ", "florist", "pharmacist", "cop"])
+            .AddConstraint("30min").IsAdjacentTo("DJ")
+            .AddConstraint("Motoralo").IsAdjacentTo("DJ")
+            .AddConstraint("40min").MustBeInPosition([1, 5])
+            .AddConstraint("Mark").Has("Xiamio")
+            .AddConstraint("red").IsBefore("Brian")
+            .AddConstraint("fever").IsImmediatelyAfter("red")
+            .AddConstraint("Jonathan").Has("throat")
+            .AddConstraint("cop").IsImmediatelyBefore("florist")
+            .AddConstraint("DJ").IsAdjacentTo("yellow")
+            .AddConstraint("dizziness").IsAdjacentTo("yellow")
+            .AddConstraint("stomach").IsImmediatelyBefore("Motoralo")
+            .AddConstraint("25min").IsImmediatelyBefore("throat")
+            .AddConstraint("Brian").Has("fever")
+            .AddConstraint("Astrus").MustBeInPosition([1, 5])
+            .AddConstraint("pain").Is("40min")
+            .AddConstraint("florist").IsAdjacentTo("pharmacist")
+            .AddConstraint("dizziness").IsImmediatelyAfter("Jonathan")
+            .AddConstraint("Ulysses").Has("dizziness")
+            .AddConstraint("10min").IsAfter("red")
+            .AddConstraint("Mark").IsAfter("pink")
+            .AddConstraint("Mark").IsBefore("black")
+            .AddConstraint("black").IsBefore("yellow")
+            .AddConstraint("Toshina").Is("10min")
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zb.Domains);
+        var workingConstraints = zb.Constraints.ToList();
+        
+        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
+
+        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+    }
+
     private static void AssertAnswer(string expected, IDomain<string> domain)
     {
         Assert.Single(domain.Values);
