@@ -6,17 +6,17 @@ namespace Csp.Builders;
 
 public class ZebraBuilder
 {
-    private int _size;
-    private Dictionary<string, List<string>> _categories = new();
+    private readonly int _size;
+    private readonly Dictionary<string, List<string>> _categories = new();
 
-    protected List<IVariable> Variables = [];
-    protected List<IConstraint<int>> Constraints = [];
-    protected readonly Domain<int> Domain;
+    private readonly List<IVariable> _variables = [];
+    private readonly List<IConstraint<int>> _constraints = [];
+    private readonly Domain<int> _domain;
     
     private ZebraBuilder(int size)
     {
         _size = size;
-        Domain = BuildDomain(size);
+        _domain = BuildDomain(size);
     }
 
     public static ZebraBuilder Create(int size) => new (size);
@@ -34,10 +34,10 @@ public class ZebraBuilder
 
         // make CSP variables
         var newVariables = values.Select(v => new BaseVariable(BuildKey(name, v))).ToList();
-        Variables.AddRange(newVariables);
+        _variables.AddRange(newVariables);
         
         // all values in category must be in a different position
-        Constraints.Add(new AllDifferentConstraint(newVariables, name));
+        _constraints.Add(new AllDifferentConstraint(newVariables, name));
 
         return this;
     }
@@ -48,7 +48,7 @@ public class ZebraBuilder
         return new ZebraConstraintBuilder(this, variable);
     }
 
-    public UniformDomainCsp<int> Build() => new (Variables, Domain, Constraints);
+    public UniformDomainCsp<int> Build() => new (_variables, _domain, _constraints);
 
     protected IVariable GetVariable(string name)
     {
@@ -59,7 +59,7 @@ public class ZebraBuilder
         }
 
         var varKey = BuildKey(categoryName, name);
-        return Variables.First(v => v.Name == varKey);
+        return _variables.First(v => v.Name == varKey);
     }
 
     private static Domain<int> BuildDomain(int size)
@@ -148,7 +148,7 @@ public class ZebraBuilder
                     throw new Exception(
                         $"Constraint conflicts with existing constraint \"{conflictingConstraint.Description}\"");
                 }
-                _builder.Constraints.Add(constraint);
+                _builder._constraints.Add(constraint);
             }
 
             return _builder;

@@ -330,6 +330,39 @@ public class ZebraTests
         }
     }
 
+    [Fact]
+    public void TestQuizBuilder1()
+    {
+        var qb = QuizBuilder.New(5)
+            .WhatIsThe().AnswerToQuestion(3).WithChoices("D", "A", "B", "E", "C").EndQuestion()
+            .WhatIsThe().CountOfAnswer("E").WithChoices(1, 4, 3, 0, 2).EndQuestion()
+            .WhatIsThe().CountOfAnswer("C").WithChoices(2, 3, 0, 1, 4).EndQuestion()
+            .WhatIsThe().AnswerToQuestion(2).WithChoices("C", "A", "D", "B", "E").EndQuestion()
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<string>>(qb.Domains);
+        var workingConstraints = qb.Constraints.ToList();
+        
+        var solvedDomains = Gac.Run(workingConstraints, workingDomains);
+    }
+    
+    [Fact]
+    public void TestQuizBuilder2()
+    {
+        var qb = QuizBuilder.New(5)
+            .WhatIsThe().First("D").WithChoices(2, 1, null, 4, 3).EndQuestion()
+            .WhatIsThe().CountOfAnswer("B").WithChoices(3, 4, 1, 0, 2).EndQuestion()
+            .WhatIsThe().AnswerToQuestion(1).WithChoices("C", "B", "A", "D", "E").EndQuestion()
+            .WhatIsThe().AnswerToQuestion(3).WithChoices("E", "D", "C", "A", "B").EndQuestion()
+            .WhatIsThe().First("A").After(1).WithChoices(3, 4, null, 5, 2).EndQuestion()
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<string>>(qb.Domains);
+        var workingConstraints = qb.Constraints.ToList();
+        
+        var solvedDomains = Gac.Run(workingConstraints, workingDomains);
+    }
+
     private static void AssertAnswer(string expected, IDomain<string> domain)
     {
         Assert.Single(domain.Values);
