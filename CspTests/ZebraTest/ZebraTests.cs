@@ -362,6 +362,52 @@ public class ZebraTests
         
         var solvedDomains = Gac.Run(workingConstraints, workingDomains);
     }
+    
+    [Fact]
+    public void TestQuizBuilder3()
+    {
+        var qb = QuizBuilder.New(5)
+            .WhatIsThe().CountOfAnswer("A").WithChoices(3, 1, 5, 4, 2).EndQuestion()
+            .WhatIsThe().OnlyConsecutiveSameSetOf(2).WithChoices(5, 6, 2, 7, 4).EndQuestion()
+            .WhatIsThe().First("E").WithChoices(null, 3, 1, 6, 8).EndQuestion()
+            .WhatIsThe().First("A").WithChoices(4, 8, 1, 3, 2).EndQuestion()
+            .WhatIsThe().First("A").After(2).WithChoices(5, 3, 4, 8, null).EndQuestion()
+            .WhatIsThe().Last("B").WithChoices(5, 7, 8, null, 3).EndQuestion()
+            .WhatIsThe().AnswerToQuestion(7).WithChoices("D", "E", "C", "B", "A").EndQuestion()
+            .WhatIsThe().OnlyQuestionWithTheSameAnswer().WithChoices(2, 1, 5, 7, 4).EndQuestion()
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<string>>(qb.Domains);
+        var workingConstraints = qb.Constraints.ToList();
+        
+        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
+
+        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+    }
+    
+    [Fact]
+    public void TestQuizBuilder4()
+    {
+        var qb = QuizBuilder.New(5)
+            .WhatIsThe().First("E").After(2).WithChoices(3, 10, 9, 5, null).EndQuestion()
+            .WhatIsThe().First("B").After(6).WithChoices(7, 9, 10, null, 8).EndQuestion()
+            .WhatIsThe().CountOfAnswer("B").WithChoices(3, 2, 6, 5, 1).EndQuestion()
+            .WhatIsThe().OnlyConsecutiveSameSetOf(2).WithChoices(4, 9, 7, 1, 5).EndQuestion()
+            .WhatIsThe().First("C").After(2).WithChoices(3, 7, 5, 4, null).EndQuestion()
+            .WhatIsThe().Last("E").Before(9).WithChoices(8, 5, 1, 2, 7).EndQuestion()
+            .WhatIsThe().CountOfAnswer("C").WithChoices(10, 1, 2, 7, 3).EndQuestion()
+            .WhatIsThe().CountOfAnswer("D").WithChoices(9, 4, 0, 7, 1).EndQuestion()
+            .WhatIsThe().First("D").WithChoices(8, 3, 5, 2, 6).EndQuestion()
+            .WhatIsThe().AnswerToQuestion(2).WithChoices("D", "C", "B", "E", "A").EndQuestion()
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<string>>(qb.Domains);
+        var workingConstraints = qb.Constraints.ToList();
+        
+        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
+
+        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+    }
 
     private static void AssertAnswer(string expected, IDomain<string> domain)
     {

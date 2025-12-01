@@ -18,54 +18,54 @@ public class OnlyConsecutiveSameConstraint(
 
     public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        // two ways to falsify:
-        // 1. a consecutive slice exists that isn't in the available slices.
-        // 2. none of the available slices have a non-empty intersection.
-        var possibleSlices = v == owner ? [ChoiceList[val]] : domains[owner].Values.Select(o => ChoiceList[o]).ToList();
-        var possibleSliceStarters = possibleSlices.Select(s => s[0]).ToList();
-        
-        // 1. check for existing slices
-        // note: number of slices of size N in a set of size S:
-        // S = 8 -> N = 3 -> 0..2 - 5..7 -> 6
-        // ending index = Q - N
-        for (var i = 0; i <= Scope.Count - _consecutiveN; i++)
+        // is there at least one supported answer in owner's domain?
+        // supported if:
+        //  - the Q's in that answer have a potential shared answer
+        //  - no other consecutive set of N is _forced_
+
+        var possibleAnswers = v == owner ? [val] : domains[owner].Values.ToList();
+        foreach (var candidate in possibleAnswers)
         {
-            var qList = Scope.ToList().Slice(i, _consecutiveN);
-            var qDomains = qList.Select(q => q == v ? [val] : domains[q].Values.ToList()).ToList();
-            if (qDomains.Any(d => d.Count > 1))
+            // can this set of questions all be equal?
+            var candidateSlice = ChoiceList[candidate];
+            var firstId = candidateSlice.Min();
+            var sliceDomains = candidateSlice.Select(c => scope.First(va => va.Id == c))
+                .Select(ov => ov == v ? [val] : domains[ov].Values.ToList()).ToList();
+            var intersection = sliceDomains[0];
+            for (var i = 1; i < sliceDomains.Count; i++)
             {
-                continue; // some unassigned, not a consec same slice
+                intersection = intersection.Intersect(sliceDomains[i]).ToList();
             }
 
-            var expected = qDomains[0][0];
-            if (qDomains.Any(d => d[0] != expected))
-            {
-                continue; // not consec same slice
-            }
+            if (intersection.Count == 0) continue;
             
-            // all are assigned, all are the same
-            // if it isn't in our list though we dun goofed
-            var startingQIndex = i + 1;
-            return possibleSliceStarters.Contains(startingQIndex);
-        }
-        
-        // 2. check that there's a possible slice with a valid intersection of options in domain
-        foreach (var i in possibleSliceStarters)
-        {
-            var qSlice = Scope.ToList().Slice(i - 1, _consecutiveN);
-            var qDomains = qSlice.Select(q => q == v ? [val] : domains[q].Values.ToList()).ToList();
-            // get intersection of domains
-            var intersection = qDomains[0];
-            for (var j = 1; j < qDomains.Count; j++)
+            // is there a forced pair anywhere else?
+            var isValid = true;
+            for (var i = 1; i <= Scope.Count - (_consecutiveN - 1); i++)
             {
-                intersection = intersection.Where(o => !qDomains[j].Contains(o)).ToList();
+                if (i == firstId) continue; // this is our valid one!
+
+                var list = new List<int>();
+                for (var j = 0; j < _consecutiveN; j++)
+                {
+                    list.Add(i + j);
+                }
+
+                var otherSliceDomains = list.Select(id => scope.First(va => va.Id == id))
+                    .Select(ov => ov == v ? [val] : domains[ov].Values.ToList()).ToList();
+
+                if (otherSliceDomains.Any(d => d.Count > 1)) continue;
+                
+                var firstAnswer = otherSliceDomains[0][0];
+
+                if (otherSliceDomains.Any(d => !d.Contains(firstAnswer))) continue;
+                
+                
+                isValid = false;
+                break;
             }
 
-            if (intersection.Count > 0)
-            {
-                // supported
-                return true;
-            }
+            if (isValid) return true;
         }
 
         return false;

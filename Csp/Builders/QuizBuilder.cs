@@ -1,4 +1,3 @@
-using System.Dynamic;
 using Csp.Impl;
 using Csp.Impl.Constraints.Selfref;
 using Csp.Interfaces;
@@ -7,36 +6,38 @@ namespace Csp.Builders;
 
 public class QuizBuilder
 {
-    private static List<string> _options = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
+    private static List<string> _options =
+        ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
+
     private readonly int _choiceCount;
     internal readonly Domain<string> Domain;
     private int _nextQuestionId = 1;
 
     private readonly List<QuestionBuilder> _questions = [];
-    
+
     private QuizBuilder(int choiceCount)
     {
         _choiceCount = choiceCount;
         Domain = new Domain<string>(_options[0..choiceCount]);
     }
 
-    public static QuizBuilder New(int size) => new (size);
+    public static QuizBuilder New(int size) => new(size);
 
-    public QuestionBuilderInit WhatIsThe() => new (this, _choiceCount, _nextQuestionId++);
+    public QuestionBuilderInit WhatIsThe() => new(this, _choiceCount, _nextQuestionId++);
 
     public UniformDomainCsp<string> Build()
     {
         // validate each question and build its constraint
         List<IOrderedVariable> variables = [];
         variables.AddRange(_questions.Select(qb => new OrderedVariable($"Q{qb.QuestionId}", qb.QuestionId)).ToList());
-        
+
         var constraints = new List<IConstraint<string>>();
         foreach (var qb in _questions)
         {
             qb.Validate();
             constraints.Add(qb.BuildConstraint(variables));
         }
-        
+
         // build csp
         return new UniformDomainCsp<string>(variables, Domain, constraints);
     }
@@ -93,6 +94,13 @@ public class QuizBuilder
             Add(b);
             return b;
         }
+
+        public OnlySameChoiceQuestionBuilder OnlyQuestionWithTheSameAnswer()
+        {
+            var b = new OnlySameChoiceQuestionBuilder(qb, choiceCount, questionId);
+            Add(b);
+            return b;
+        }
     }
 
     public abstract class QuestionBuilder(QuizBuilder qb, int choiceCount, int questionId)
@@ -122,9 +130,9 @@ public class QuizBuilder
         public TBuild WithChoices(params T[] choices)
         {
             Choices.AddRange(choices);
-            return (TBuild) this;
+            return (TBuild)this;
         }
-        
+
         protected void ValidateChoices()
         {
             if (Choices.Count != ChoiceCount)
@@ -173,10 +181,11 @@ public class QuizBuilder
             ValidateChoices();
         }
     }
-    
+
     public class CountOfChoiceQuestionBuilder : QuestionBuilder<int, CountOfChoiceQuestionBuilder>
     {
         private readonly string _choiceToCount;
+
         internal CountOfChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, string choiceToCount) :
             base(qb, choiceCount, questionId)
         {
@@ -214,11 +223,13 @@ public class QuizBuilder
         private int? _threshold;
         private bool _isAfter;
 
-        private int MaxQuestionId => _threshold == null || _isAfter ? Builder._nextQuestionId - 1 : _threshold.Value - 1;
+        private int MaxQuestionId =>
+            _threshold == null || _isAfter ? Builder._nextQuestionId - 1 : _threshold.Value - 1;
+
         private int MinQuestionId => _threshold == null || !_isAfter ? 1 : _threshold.Value + 1;
-        
-        internal FirstWithChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, string choiceToCount, bool isReverse) :
-            base(qb, choiceCount, questionId)
+
+        internal FirstWithChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, string choiceToCount,
+            bool isReverse) : base(qb, choiceCount, questionId)
         {
             _choiceToCount = choiceToCount;
             _isReverse = isReverse;
@@ -257,7 +268,7 @@ public class QuizBuilder
             {
                 throw new Exception($"Answer to find {_choiceToCount} not in domain {{{string.Join(",", domain)}}}");
             }
-            
+
             var badChoices = Choices
                 .Where(choice => choice != null && (choice > MaxQuestionId || choice < MinQuestionId))
                 .Select(v => v!.Value).ToList();
@@ -274,7 +285,7 @@ public class QuizBuilder
     public class MostLeastCommonQuestionBuilder : QuestionBuilder<string?, MostLeastCommonQuestionBuilder>
     {
         private readonly bool _isLeast;
-        
+
         internal MostLeastCommonQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, bool isLeast) :
             base(qb, choiceCount, questionId)
         {
@@ -293,16 +304,17 @@ public class QuizBuilder
                 throw new Exception(
                     $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", domain)}}}");
             }
-            
+
             ValidateChoices();
         }
     }
-    
+
     public class OnlyConsecutiveSameQuestionBuilder : QuestionBuilder<int, OnlyConsecutiveSameQuestionBuilder>
     {
         private readonly int _consecutiveSameSize;
-        
-        internal OnlyConsecutiveSameQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, int consecutiveSame) : base(qb, choiceCount, questionId)
+
+        internal OnlyConsecutiveSameQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId,
+            int consecutiveSame) : base(qb, choiceCount, questionId)
         {
             _consecutiveSameSize = consecutiveSame;
         }
@@ -328,13 +340,36 @@ public class QuizBuilder
             // if 8 questions and our set size is 3, the highest one can be 6 -> checking 6-8
             // if 8 questions, the next id at this point is 9, so 9-3 = 6.
             var maxQuestionId = Builder._nextQuestionId - _consecutiveSameSize;
-            var badChoices = Choices.Select(c => c < 1 || c > maxQuestionId).ToList();
+            var badChoices = Choices.Where(c => c < 1 || c > maxQuestionId).ToList();
             if (badChoices.Count > 0)
             {
                 throw new Exception(
                     $"Choices {{{string.Join(",", badChoices)}}} must be between 1 and {maxQuestionId}, inclusive");
             }
-            
+
+            ValidateChoices();
+        }
+    }
+
+    public class OnlySameChoiceQuestionBuilder : QuestionBuilder<int, OnlySameChoiceQuestionBuilder>
+    {
+        internal OnlySameChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId) : base(qb, choiceCount,
+            questionId)
+        {
+        }
+
+        internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables) =>
+            new OnlySameChoiceConstraint(GetMe(variables), variables, Choices);
+
+        internal override void Validate()
+        {
+            var badChoices = Choices.Where(c => c < 1 || c >= Builder._nextQuestionId).ToList();
+            if (badChoices.Count > 0)
+            {
+                throw new Exception(
+                    $"Choices {{{string.Join(",", badChoices)}}} must be between 1 and {Builder._nextQuestionId - 1}, inclusive");
+            }
+
             ValidateChoices();
         }
     }
