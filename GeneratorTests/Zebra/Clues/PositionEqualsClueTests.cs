@@ -33,6 +33,13 @@ public class PositionEqualsClueTests
     }
 
     [Fact]
+    public void PositionEqualsClue_IsNotEquivalentToNull()
+    {
+        var sut = BuildClue(CatA, ValA, PosA);
+        Assert.False(sut.IsEquivalentTo(null));
+    }
+
+    [Fact]
     public void PositionEqualsClue_DoesNotContradictNull()
     {
         var sut = BuildClue(CatA, ValA, PosA);
@@ -100,6 +107,7 @@ public class PositionEqualsClueTests
     public void PositionEqualsClue_DoesNotImplyAnythingElse()
     {
         var sut = BuildClue(CatA, ValA, PosA);
+        Assert.False(sut.Implies(null));
 
         var differentPos = BuildClue(CatA, ValA, PosB);
         Assert.False(sut.Implies(differentPos));
