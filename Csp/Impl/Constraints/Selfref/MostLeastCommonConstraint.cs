@@ -7,9 +7,10 @@ public class MostLeastCommonConstraint(
     IVariable owner,
     IEnumerable<IVariable> scope,
     IEnumerable<string?> choiceList,
-    bool isLeastCommon = false) : BaseSelfRefConstraint<string?>(scope, choiceList)
+    bool isLeastCommon = false,
+    bool isMostCommonCount = false) : BaseSelfRefConstraint<string?>(scope, choiceList)
 {
-    public override string Name => $"{_descriptor}Common";
+    public override string Name => $"{_descriptor}Common{(isMostCommonCount ? "Count" : "")}";
     public override string Description => $"{_descriptor} common answer is {owner.Name}={{{OptionString}}}";
 
     private readonly string _descriptor = isLeastCommon ? "Least" : "Most";
@@ -50,6 +51,14 @@ public class MostLeastCommonConstraint(
         
         // now we have minimum and maximum counts for each option.
         // check if any support this v assignment.
+
+        if (isMostCommonCount)
+        {
+            // map to ints and check t value instead -
+            return ownerOptions.Select(oo => ChoiceList[oo])
+                .Any(choice => CanMostCommonCountBe(minimums, maximums, int.Parse(choice!)));
+        }
+        
         return ownerOptions.Select(oo => ChoiceList[oo]).Any(choice => IsValid(minimums, maximums, choice));
     }
 
@@ -80,8 +89,11 @@ public class MostLeastCommonConstraint(
     private bool CanMostCommonTieExist(IDictionary<string, int> minimums, IDictionary<string, int> maximums) =>
         ExistsViaIntegerFeasibility(minimums, maximums, false);
 
+    private bool CanMostCommonCountBe(IDictionary<string, int> minimums, IDictionary<string, int> maximums, int tValue)
+        => ExistsViaIntegerFeasibility(minimums, maximums, false, null, tValue);
+
     private bool ExistsViaIntegerFeasibility(IDictionary<string, int> minimums, IDictionary<string, int> maximums,
-        bool isLeastCommon = false, string? checkForWinner = null)
+        bool checkLeastCommon = false, string? checkForWinner = null, int? checkForT = null)
     {
         // generic function to see if there is a possible clear winner or a feasible tie via integer feasibility.
         // tries to find subsets of options where a valid solution exists.
@@ -96,7 +108,8 @@ public class MostLeastCommonConstraint(
         }
         else
         {
-            var minSubsetSize = 2;
+            // if we're checking for a _count_ we want to include a sole winner.
+            var minSubsetSize = checkForT != null ? 1 : 2;
             var maxSubsetSize = Options.Count;
             for (var i = minSubsetSize; i <= maxSubsetSize; i++)
             {
@@ -116,13 +129,16 @@ public class MostLeastCommonConstraint(
                 tmax = Math.Min(tmax, maximums[o]);
             }
             // if there is no overlap (i.e. count(s1) can't ever equal count(s2)) fail
-            if (tmin > tmax)
+            // if we're checking for a specific T, and it's not in this range, also fail.
+            if (tmin > tmax || tmin > checkForT || tmax < checkForT)
             {
                 continue;
             }
             
             // see if we can feasibly force a winner or tie with this S and range of T
-            for (var t = tmin; t <= tmax; t++)
+            var tRangeMin = checkForT ?? tmin;
+            var tRangeMax = checkForT ?? tmax;
+            for (var t = tRangeMin; t <= tRangeMax; t++)
             {
                 // we know each option in S has count T exactly
                 var assignedCount = optionSubset.Count * t;
@@ -144,7 +160,7 @@ public class MostLeastCommonConstraint(
                     // this is where the least/most common distinction lies
                     int optionLowerBound, optionUpperBound;
                     // most common tie:
-                    if (isLeastCommon)
+                    if (checkLeastCommon)
                     {
                         // clamp option not in S floor to T+1
                         optionLowerBound = Math.Max(minimums[o2], t + 1);

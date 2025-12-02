@@ -11,12 +11,20 @@ namespace Csp.Impl.Constraints.Selfref;
 public class FirstWithChoiceConstraint(
     IOrderedVariable owner,
     IEnumerable<IOrderedVariable> rangeToCheck,
-    string expected,
     IEnumerable<int?> choiceList,
-    bool isReverse = false) : BaseSelfRefConstraint<int?>(rangeToCheck.Contains(owner) ? rangeToCheck : [..rangeToCheck, owner], choiceList)
+    string? expected = null,
+    bool isReverse = false,
+    bool isDeterminedByOwner = false) : BaseSelfRefConstraint<int?>(rangeToCheck.Contains(owner) ? rangeToCheck : [..rangeToCheck, owner], choiceList)
 {
+    // can also do:
+    // - last with choice
+    // - first/last with same as owner
+    
     public override string Name => "FirstWithChoice";
-    public override string Description => $"First Q with choice {expected} is {owner.Name}=>{{{OptionString}}}";
+    public override string Description => $"{_descriptor} Q with {_whichChoice} is {owner.Name}=>{{{OptionString}}}";
+
+    private readonly string _descriptor = isReverse ? "Last" : "First";
+    private readonly string _whichChoice = isDeterminedByOwner ? $"same choice as {owner.Name}" : $"choice {expected}";
 
     private readonly Comparison<IOrderedVariable> _comparer = isReverse ? (a, b) => b.Id - a.Id : (a, b) => a.Id - b.Id;
 
@@ -27,14 +35,15 @@ public class FirstWithChoiceConstraint(
         // make sure we have a sort
         _window.Sort(_comparer);
 
-        var firstsToCheck = v == owner ? [ChoiceList[val]] : domains[owner].Values.Select(o => ChoiceList[o]).ToList();
-
-        foreach (var firstQId in firstsToCheck)
+        var ownerOptions = v == owner ? [val] : domains[owner].Values.ToList();
+        foreach (var candidate in ownerOptions)
         {
+            var firstQId = ChoiceList[candidate];
+            var valueToCheck = isDeterminedByOwner ? candidate : expected;
             if (firstQId == null)
             {
                 // check that every Q can be assigned to not expected
-                if (_window.All(q => (q == v ? [val] : domains[q].Values.ToList()).Any(o => o != expected)))
+                if (_window.All(q => (q == v ? [val] : domains[q].Values.ToList()).Any(o => o != valueToCheck)))
                 {
                     // found one
                     return true;
@@ -49,7 +58,7 @@ public class FirstWithChoiceConstraint(
             var targetQ = _window[targetIdx];
 
             var targetQDomain = targetQ == v ? [val] : domains[targetQ].Values.ToList();
-            if (!targetQDomain.Contains(expected))
+            if (!targetQDomain.Contains(valueToCheck!))
             {
                 continue; // not supported if it can't even be that option
             }
@@ -60,7 +69,7 @@ public class FirstWithChoiceConstraint(
             {
                 var qi =  _window[i];
                 var qiDomain = qi == v ? [val] :  domains[qi].Values.ToList();
-                if (qiDomain.Count == 1 && qiDomain[0] == expected)
+                if (qiDomain.Count == 1 && qiDomain[0] == valueToCheck!)
                 {
                     supported = false;
                     break;
