@@ -14,7 +14,7 @@ public class ChoiceEqualsConstraint(IOrderedVariable owner, IOrderedVariable loo
         
         foreach (var c in candidates)
         {
-            var otherOption = ChoiceList[c];
+            var otherOption = GetChoice(c);
             if (domains[lookingAt].Values.Contains(otherOption)) return true;
         }
 

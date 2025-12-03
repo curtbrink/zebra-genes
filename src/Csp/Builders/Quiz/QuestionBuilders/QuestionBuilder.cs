@@ -15,11 +15,8 @@ public abstract class QuestionBuilder<TParent> where TParent : QuestionListBuild
         QuestionId = questionId;
     }
 
-    internal abstract IConstraint<string> BuildConstraint(List<IOrderedVariable> variables);
-    internal abstract void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true);
+    internal abstract IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables);
+    internal abstract void Validate();
 
     public TParent EndQuestion() => Builder;
-
-    protected IOrderedVariable GetMe(List<IOrderedVariable> variables) =>
-        variables.First(v => v.Id == QuestionId);
 }

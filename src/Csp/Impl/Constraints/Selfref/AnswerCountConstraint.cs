@@ -33,6 +33,6 @@ public class AnswerCountConstraint(
             }
         }
 
-        return optionsToCheck.Any(o => ChoiceList[o] >= min && ChoiceList[o] <= max);
+        return optionsToCheck.Any(o => GetChoice(o) >= min && GetChoice(o) <= max);
     }
 }

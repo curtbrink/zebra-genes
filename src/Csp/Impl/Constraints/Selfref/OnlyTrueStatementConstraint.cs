@@ -14,6 +14,6 @@ public class OnlyTrueStatementConstraint(
     protected override bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
         var candidates = domains[owner].Values.ToList();
-        return candidates.Any(c => ChoiceList[c].IsSatisfiable(null, null, domains));
+        return candidates.Any(c => GetChoice(c).IsSatisfiable(null, null, domains));
     }
 }

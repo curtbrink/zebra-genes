@@ -14,8 +14,8 @@ public class
     private bool _isDeterminedByOwner;
     private string? _choiceToCount;
 
-    private int MaxQuestionId =>
-        _threshold == null || _isAfter ? Builder.MaxQuestionId : _threshold.Value - 1;
+    private int? MaxQuestionId =>
+        _threshold == null || _isAfter ? null : _threshold.Value - 1;
 
     private int MinQuestionId => _threshold == null || !_isAfter ? 1 : _threshold.Value + 1;
 
@@ -62,20 +62,20 @@ public class
         return this;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables)
     {
         // what's my range?
         var rangeToCheck = new List<IOrderedVariable>();
-        for (var i = MinQuestionId; i <= MaxQuestionId; i++)
+        for (var i = MinQuestionId; i <= (MaxQuestionId ?? variables.Count); i++)
         {
             rangeToCheck.Add(variables.First(v => v.Id == i));
         }
 
-        return new FirstWithChoiceConstraint(GetMe(variables), rangeToCheck, Choices, _choiceToCount, _isReverse,
+        return new FirstWithChoiceConstraint(me, rangeToCheck, Choices, _choiceToCount, _isReverse,
             _isDeterminedByOwner);
     }
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
         // check type of question
         if (_isDeterminedByOwner)
@@ -85,19 +85,19 @@ public class
         else
         {
             if (_choiceToCount == null) throw new Exception($"First/last with answer has no answer to look for");
-            if (!domain.Contains(_choiceToCount))
+            if (!Builder.Domain.Values.Contains(_choiceToCount))
                 throw new Exception(
-                    $"Answer to find {_choiceToCount} not in domain {{{string.Join(",", domain)}}}");
+                    $"Answer to find {_choiceToCount} not in domain {{{string.Join(",", Builder.Domain.Values)}}}");
         }
 
-        var badChoices = Choices
-            .Where(choice => choice != null && (choice > MaxQuestionId || choice < MinQuestionId))
-            .Select(v => v!.Value).ToList();
-        if (badChoices.Count > 0)
-        {
-            throw new Exception(
-                $"Choices {{{string.Join(",", badChoices)}}} must be between {MinQuestionId} and {MaxQuestionId}, inclusive");
-        }
+        // var badChoices = Choices
+        //     .Where(choice => choice != null && (choice > MaxQuestionId || choice < MinQuestionId))
+        //     .Select(v => v!.Value).ToList();
+        // if (badChoices.Count > 0)
+        // {
+        //     throw new Exception(
+        //         $"Choices {{{string.Join(",", badChoices)}}} must be between {MinQuestionId} and {MaxQuestionId}, inclusive");
+        // }
 
         ValidateChoices();
     }

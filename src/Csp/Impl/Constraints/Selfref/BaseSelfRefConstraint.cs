@@ -11,6 +11,9 @@ public abstract class BaseSelfRefConstraint : IConstraint<string>
     public abstract string Description { get; }
     
     public abstract IReadOnlyList<IVariable> Scope { get; }
+    
+    // set this flag when using as part of an OnlyTrueStatement, so that we always look in choiceList["A"].
+    public bool OverrideSingle = false;
 
     public bool IsSatisfiable(IVariable? v, string? val, IDictionary<IOrderedVariable, IDomain<string>> domains)
     {

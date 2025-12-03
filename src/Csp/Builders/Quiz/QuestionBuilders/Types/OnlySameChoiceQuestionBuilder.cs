@@ -12,10 +12,10 @@ public class
     {
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables) =>
-        new OnlySameChoiceConstraint(GetMe(variables), variables, Choices);
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables) =>
+        new OnlySameChoiceConstraint(me, variables, Choices);
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
         var badChoices = Choices.Where(c => c < 1 || c > Builder.MaxQuestionId).ToList();
         if (badChoices.Count > 0)

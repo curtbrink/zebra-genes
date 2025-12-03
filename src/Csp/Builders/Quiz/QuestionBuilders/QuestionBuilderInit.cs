@@ -1,3 +1,5 @@
+using Csp.Interfaces;
+
 namespace Csp.Builders.Quiz;
 
 public class QuestionBuilderInit<TParent>(TParent qb, int choiceCount, int questionId)
@@ -91,5 +93,14 @@ public class QuestionBuilderInit<TParent>(TParent qb, int choiceCount, int quest
         var lb = OnlyTrueStatementQuestionBuilder<TParent>.New(qb, choiceCount, questionId);
         Add(lb.Parent); // but we can still access the wrapper question builder
         return lb;
+    }
+    
+    // ==== CUSTOM CONSTRAINT ====
+    public CustomConstraintQuestionBuilder<TParent> CustomConstraint(
+        Func<IOrderedVariable, IDictionary<IOrderedVariable, IDomain<string>>, bool> truthFunc)
+    {
+        var b = new CustomConstraintQuestionBuilder<TParent>(qb, choiceCount, questionId, truthFunc);
+        Add(b);
+        return b;
     }
 }

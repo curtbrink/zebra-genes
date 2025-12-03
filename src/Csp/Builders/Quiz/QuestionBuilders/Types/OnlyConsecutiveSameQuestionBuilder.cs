@@ -15,7 +15,7 @@ public class
         _consecutiveSameSize = consecutiveSame;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables)
     {
         // need to convert "starting ids" to the actual window
         var windows = Choices.Select(c =>
@@ -28,10 +28,10 @@ public class
 
             return window;
         }).ToList();
-        return new OnlyConsecutiveSameConstraint(GetMe(variables), variables, windows);
+        return new OnlyConsecutiveSameConstraint(me, variables, windows);
     }
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
         // if 8 questions and our set size is 3, the highest one can be 6 -> checking 6-8
         // if 8 questions, the next id at this point is 9, so 9-3 = 6.

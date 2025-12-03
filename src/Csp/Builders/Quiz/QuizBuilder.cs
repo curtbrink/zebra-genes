@@ -27,8 +27,9 @@ public class QuizBuilder : QuestionListBuilder<QuizBuilder>
         var constraints = new List<IConstraint<string>>();
         foreach (var qb in Questions)
         {
-            qb.Validate(1, _nextQuestionId - 1, Domain.Values.ToList());
-            constraints.Add(qb.BuildConstraint(variables));
+            qb.Validate();
+            var me = variables.First(q => q.Id == qb.QuestionId);
+            constraints.Add(qb.BuildConstraint(me, variables));
         }
 
         // build csp

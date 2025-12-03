@@ -55,11 +55,11 @@ public class MostLeastCommonConstraint(
         if (isMostCommonCount)
         {
             // map to ints and check t value instead -
-            return ownerOptions.Select(oo => ChoiceList[oo])
+            return ownerOptions.Select(GetChoice)
                 .Any(choice => CanMostCommonCountBe(minimums, maximums, int.Parse(choice!)));
         }
         
-        return ownerOptions.Select(oo => ChoiceList[oo]).Any(choice => IsValid(minimums, maximums, choice));
+        return ownerOptions.Select(GetChoice).Any(choice => IsValid(minimums, maximums, choice));
     }
 
     private bool IsValid(IDictionary<string, int> minimums, IDictionary<string, int> maximums, string? choice)

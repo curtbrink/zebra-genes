@@ -14,25 +14,23 @@ public class MapChoiceQuestionBuilder<TParent> : QuestionBuilder<string, TParent
         _mapToQuestionId = otherQuestionId;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables)
     {
         var other = variables.First(v => v.Id == _mapToQuestionId);
-        return new ChoiceEqualsConstraint(GetMe(variables), other, Choices);
+        return new ChoiceEqualsConstraint(me, other, Choices);
     }
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
-        if (!shouldValidate) return;
-        
-        if (_mapToQuestionId < minQ || _mapToQuestionId > maxQ)
+        if (_mapToQuestionId < Builder.MinQuestionId || _mapToQuestionId > Builder.MaxQuestionId)
         {
             throw new Exception($"Question #{_mapToQuestionId} not found");
         }
-        var badChoices = Choices.Where(c => !domain.Contains(c)).ToList();
+        var badChoices = Choices.Where(c => !Builder.Domain.Values.Contains(c)).ToList();
         if (badChoices.Count > 0)
         {
             throw new Exception(
-                $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", domain)}}}");
+                $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", Builder.Domain.Values)}}}");
         }
 
         ValidateChoices();

@@ -304,17 +304,57 @@ public class QuizTests
     [Fact]
     public void TestQuizBuilder5()
     {
+        // set up only true statement customs
+        var twoA = (IOrderedVariable me, IDictionary<IOrderedVariable, IDomain<string>> domains) =>
+        {
+            // is it possible for these to be the only 7 As?
+            List<int> onlyAs = [1, 4, 6, 8, 10, 11, 12];
+            var k = domains.Keys.ToList();
+            for (var i = 1; i <= domains.Keys.Count; i++)
+            {
+                var q = k.First(qu => qu.Id == i);
+                if (onlyAs.Contains(i))
+                {
+                    // domain needs to contain A yet
+                    if (!domains[q].Values.Contains("A"))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // domain can't be a forced A
+                    if (domains[q].Values.Contains("A") && domains[q].Values.Count == 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        };
         var qb = QuizBuilder.New(5)
             .WhatIsThe().Last().Before(7).WithAnswer("E").WithChoices(4, null, 2, 1, 6).EndQuestion()
-            // only true statement but need dummy
-            .WhatIsThe().AnswerToQuestion(2).WithChoices("A", "B", "C", "D", "E").EndQuestion()
+            .WhatIsThe().OnlyTrueStatement()
+                .WhatIsThe().CustomConstraint(twoA).EndQuestion()
+                .WhatIsThe().CountOfVowels().WithChoices(11).EndQuestion()
+                .WhatIsThe().First().WithAnswer("B").WithChoices(1).EndQuestion()
+                .WhatIsThe().CountOfAnswer("A").After(8).WithChoices(1).EndQuestion()
+                .WhatIsThe().LeastCommonAnswer().WithChoices("C").EndQuestion()
+            .Finished().EndQuestion()
             .WhatIsThe().AnswerToQuestion(2).WithChoices("B", "A", "E", "D", "C").EndQuestion()
             .WhatIsThe().Last().WithSameAnswer().WithChoices(12, 9, 11, 10, 4).EndQuestion()
             .WhatIsThe().AnswerToQuestion(9).WithChoices("E", "B", "D", "A", "C").EndQuestion()
             .WhatIsThe().CountOfVowels().WithChoices(12, 9, 8, 3, 11).EndQuestion()
             .WhatIsThe().CountOfMostCommonAnswer().WithChoices(4, 10, 5, 11, 6).EndQuestion()
             // only true statement but need dummy
-            .WhatIsThe().AnswerToQuestion(8).WithChoices("A", "B", "C", "D", "E").EndQuestion()
+            .WhatIsThe().OnlyTrueStatement()
+                .WhatIsThe().LeastCommonAnswer().WithChoices([null]).EndQuestion()
+                .WhatIsThe().First().WithAnswer("B").WithChoices(9).EndQuestion()
+                .WhatIsThe().First().WithSameAnswer().WithChoices(2).EndQuestion()
+                .WhatIsThe().CountOfAnswer("E").WithChoices(11).EndQuestion()
+                .WhatIsThe().AnswerToQuestion(12).WithChoices("B").EndQuestion()
+            .Finished().EndQuestion()
             .WhatIsThe().MostCommonAnswer().WithChoices("D", "E", "C", null, "A").EndQuestion()
             .WhatIsThe().First().After(1).WithAnswer("E").WithChoices(10, 4, 12, 8, 6).EndQuestion()
             .WhatIsThe().CountOfAnswer("E").Before(12).WithChoices(5, 3, 10, 4, 0).EndQuestion()
@@ -327,6 +367,10 @@ public class QuizTests
         var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
 
         var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+        
+        // holy fligoogleshmacks batman
+        // it gave the right solution
+        // my social life is officially suffering
     }
 
     public void Playground()

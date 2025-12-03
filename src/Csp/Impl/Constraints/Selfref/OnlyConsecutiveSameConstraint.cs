@@ -12,7 +12,7 @@ public class OnlyConsecutiveSameConstraint(
     public override string Description => $"Only {_consecutiveN} consecutive same starts with {owner.Name}={{{OptionString}}}";
     
     private new string OptionString => string.Join("|", OptionListItems);
-    private List<string> OptionListItems => ChoiceList.Keys.Select(k => $"{k}={ChoiceList[k].First()}").ToList();
+    private List<string> OptionListItems => Options.Select(k => $"{k}={GetChoice(k).First()}").ToList();
     
     private readonly int _consecutiveN = choiceList.ElementAt(0).Count;
 
@@ -27,7 +27,7 @@ public class OnlyConsecutiveSameConstraint(
         foreach (var candidate in possibleAnswers)
         {
             // can this set of questions all be equal?
-            var candidateSlice = ChoiceList[candidate];
+            var candidateSlice = GetChoice(candidate);
             var firstId = candidateSlice.Min();
             var sliceDomains = candidateSlice.Select(c => scope.First(va => va.Id == c))
                 .Select(ov => domains[ov].Values.ToList()).ToList();

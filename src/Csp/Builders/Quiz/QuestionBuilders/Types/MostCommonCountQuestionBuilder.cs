@@ -12,11 +12,11 @@ public class
     {
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables) =>
-        new MostLeastCommonConstraint(GetMe(variables), variables, Choices.Select(c => c.ToString()).ToList(),
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables) =>
+        new MostLeastCommonConstraint(me, variables, Choices.Select(c => c.ToString()).ToList(),
             false, true);
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
         var badChoices = Choices.Where(choice => choice > Builder.MaxQuestionId || choice < 0).ToList();
         if (badChoices.Count > 0)

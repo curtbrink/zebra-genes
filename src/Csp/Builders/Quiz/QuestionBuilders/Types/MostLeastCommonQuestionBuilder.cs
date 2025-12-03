@@ -15,16 +15,16 @@ public class
         _isLeast = isLeast;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables) =>
-        new MostLeastCommonConstraint(GetMe(variables), variables, Choices, _isLeast);
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables) =>
+        new MostLeastCommonConstraint(me, variables, Choices, _isLeast);
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
-        var badChoices = Choices.Where(c => c != null && !domain.Contains(c)).ToList();
+        var badChoices = Choices.Where(c => c != null && !Builder.Domain.Values.Contains(c)).ToList();
         if (badChoices.Count > 0)
         {
             throw new Exception(
-                $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", domain)}}}");
+                $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", Builder.Domain.Values)}}}");
         }
 
         ValidateChoices();

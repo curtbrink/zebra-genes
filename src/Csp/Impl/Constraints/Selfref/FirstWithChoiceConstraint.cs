@@ -38,7 +38,7 @@ public class FirstWithChoiceConstraint(
         var ownerOptions = domains[owner].Values.ToList();
         foreach (var candidate in ownerOptions)
         {
-            var firstQId = ChoiceList[candidate];
+            var firstQId = GetChoice(candidate);
             var valueToCheck = isDeterminedByOwner ? candidate : expected;
             if (firstQId == null)
             {

@@ -21,7 +21,7 @@ public class OnlySameChoiceConstraint(
         foreach (var candidate in possibleValues)
         {
             // get target question
-            var target = scope.FirstOrDefault(s => s.Id == ChoiceList[candidate]);
+            var target = scope.FirstOrDefault(s => s.Id == GetChoice(candidate));
             if (target == null) continue;
 
             if (!domains[target].Values.Contains(candidate)) continue;

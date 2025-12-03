@@ -30,14 +30,24 @@ public class
         return listBuilder;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables)
     {
-        throw new NotImplementedException();
+        if (_child == null) throw new InvalidOperationException("Somehow I don't have a list builder.");
+        // need an OnlyTrueStatementConstraint
+        var childConstraints = _child.Questions.Select(q => (BaseSelfRefConstraint)q.BuildConstraint(me, variables))
+            .ToList();
+        foreach (var childConstraint in childConstraints)
+        {
+            childConstraint.OverrideSingle = true;
+        }
+
+        return new OnlyTrueStatementConstraint(me, variables, childConstraints);
     }
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
-        throw new NotImplementedException();
+        // do I have to? I trust myself
+        return;
     }
 
     public class OnlyTrueStatementListBuilder : QuestionListBuilder<OnlyTrueStatementListBuilder>

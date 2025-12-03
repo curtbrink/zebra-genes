@@ -12,8 +12,8 @@ public class
     private int? _threshold;
     private bool _isAfter;
 
-    private int MaxQuestionId =>
-        _threshold == null || _isAfter ? Builder.MaxQuestionId : _threshold.Value - 1;
+    private int? MaxQuestionId =>
+        _threshold == null || _isAfter ? null : _threshold.Value - 1;
 
     private int MinQuestionId => _threshold == null || !_isAfter ? 1 : _threshold.Value + 1;
 
@@ -37,23 +37,23 @@ public class
         return this;
     }
 
-    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    internal override IConstraint<string> BuildConstraint(IOrderedVariable me, List<IOrderedVariable> variables)
     {
         // what's my range?
         var rangeToCheck = new List<IOrderedVariable>();
-        for (var i = MinQuestionId; i <= MaxQuestionId; i++)
+        for (var i = MinQuestionId; i <= (MaxQuestionId ?? variables.Count); i++)
         {
             rangeToCheck.Add(variables.First(v => v.Id == i));
         }
 
-        return new AnswerCountConstraint(GetMe(variables), rangeToCheck, _choicesToCount, Choices);
+        return new AnswerCountConstraint(me, rangeToCheck, _choicesToCount, Choices);
     }
 
-    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    internal override void Validate()
     {
-        if (!_choicesToCount.All(domain.Contains))
+        if (!_choicesToCount.All(Builder.Domain.Values.Contains))
         {
-            throw new Exception($"Answers to count contains a value not in domain {{{string.Join(",", domain)}}}");
+            throw new Exception($"Answers to count contains a value not in domain {{{string.Join(",", Builder.Domain.Values)}}}");
         }
 
         var badChoices = Choices.Where(choice => choice > Builder.MaxQuestionId || choice < 0).ToList();
