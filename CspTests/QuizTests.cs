@@ -11,12 +11,12 @@ public class QuizTests
     [Fact]
     public void TestSelfReferencingVeryEasy()
     {
-        var q1 = new BaseVariable("Q1");
-        var q2 = new BaseVariable("Q2");
-        var q3 = new BaseVariable("Q3");
-        var q4 = new BaseVariable("Q4");
+        var q1 = new OrderedVariable("Q1", 1);
+        var q2 = new OrderedVariable("Q2", 2);
+        var q3 = new OrderedVariable("Q3", 3);
+        var q4 = new OrderedVariable("Q4", 4);
 
-        List<IVariable> allQs = [q1, q2, q3, q4];
+        List<IOrderedVariable> allQs = [q1, q2, q3, q4];
 
         var domain = new Domain<string>(["A", "B", "C", "D", "E"]);
 
@@ -333,7 +333,9 @@ public class QuizTests
     {
         // doesn't run just checking syntax
         var q = QuizBuilder.New(5)
-            .WhatIsThe().Next().WithSameAnswer().WithChoices(5, 6, 7, 8, 9).EndQuestion();
+            .WhatIsThe().OnlyTrueStatement()
+            .WhatIsThe().First().WithAnswer("A").WithChoices(4).EndQuestion()
+            .Finished().EndQuestion();
     }
     
     private static void AssertAnswer(string expected, IDomain<string> domain)

@@ -3,106 +3,102 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public partial class QuizBuilder
+public class
+    FirstWithChoiceQuestionBuilder<TParent> : QuestionBuilder<int?, FirstWithChoiceQuestionBuilder<TParent>, TParent>
+    where TParent : QuestionListBuilder<TParent>
 {
-    public class FirstWithChoiceQuestionBuilder : QuestionBuilder<int?, FirstWithChoiceQuestionBuilder>
+    private readonly bool _isReverse;
+
+    private int? _threshold;
+    private bool _isAfter;
+    private bool _isDeterminedByOwner;
+    private string? _choiceToCount;
+
+    private int MaxQuestionId =>
+        _threshold == null || _isAfter ? Builder.MaxQuestionId : _threshold.Value - 1;
+
+    private int MinQuestionId => _threshold == null || !_isAfter ? 1 : _threshold.Value + 1;
+
+    internal FirstWithChoiceQuestionBuilder(TParent qb, int choiceCount, int questionId, bool isReverse,
+        bool isNext = false) : base(qb, choiceCount, questionId)
     {
-        private readonly bool _isReverse;
-
-        private int? _threshold;
-        private bool _isAfter;
-        private bool _isDeterminedByOwner;
-        private string? _choiceToCount;
-
-        private int MaxQuestionId =>
-            _threshold == null || _isAfter ? Builder._nextQuestionId - 1 : _threshold.Value - 1;
-
-        private int MinQuestionId => _threshold == null || !_isAfter ? 1 : _threshold.Value + 1;
-
-        internal FirstWithChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, bool isReverse,
-            bool isNext = false) : base(qb, choiceCount, questionId)
+        // first x => no threshold, not reverse
+        // last x => no threshold, reverse
+        // next x => threshold, not reverse, isAfter
+        // prev x => threshold, reverse, isBefore
+        _isReverse = isReverse;
+        if (isNext)
         {
-            // first x => no threshold, not reverse
-            // last x => no threshold, reverse
-            // next x => threshold, not reverse, isAfter
-            // prev x => threshold, reverse, isBefore
-            _isReverse = isReverse;
-            if (isNext)
-            {
-                _threshold = questionId;
-                _isAfter = !isReverse;
-            }
+            _threshold = questionId;
+            _isAfter = !isReverse;
+        }
+    }
+
+    public FirstWithChoiceQuestionBuilder<TParent> Before(int threshold)
+    {
+        _isAfter = false;
+        _threshold = threshold;
+        return this;
+    }
+
+    public FirstWithChoiceQuestionBuilder<TParent> After(int threshold)
+    {
+        _isAfter = true;
+        _threshold = threshold;
+        return this;
+    }
+
+    public FirstWithChoiceQuestionBuilder<TParent> WithAnswer(string answer)
+    {
+        _isDeterminedByOwner = false;
+        _choiceToCount = answer;
+        return this;
+    }
+
+    public FirstWithChoiceQuestionBuilder<TParent> WithSameAnswer()
+    {
+        _isDeterminedByOwner = true;
+        _choiceToCount = null;
+        return this;
+    }
+
+    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    {
+        // what's my range?
+        var rangeToCheck = new List<IOrderedVariable>();
+        for (var i = MinQuestionId; i <= MaxQuestionId; i++)
+        {
+            rangeToCheck.Add(variables.First(v => v.Id == i));
         }
 
-        public FirstWithChoiceQuestionBuilder Before(int threshold)
+        return new FirstWithChoiceConstraint(GetMe(variables), rangeToCheck, Choices, _choiceToCount, _isReverse,
+            _isDeterminedByOwner);
+    }
+
+    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    {
+        // check type of question
+        if (_isDeterminedByOwner)
         {
-            _isAfter = false;
-            _threshold = threshold;
-            return this;
+            if (_choiceToCount != null) throw new Exception($"Same as this one question has a defined answer.");
         }
-
-        public FirstWithChoiceQuestionBuilder After(int threshold)
+        else
         {
-            _isAfter = true;
-            _threshold = threshold;
-            return this;
-        }
-
-        public FirstWithChoiceQuestionBuilder WithAnswer(string answer)
-        {
-            _isDeterminedByOwner = false;
-            _choiceToCount = answer;
-            return this;
-        }
-
-        public FirstWithChoiceQuestionBuilder WithSameAnswer()
-        {
-            _isDeterminedByOwner = true;
-            _choiceToCount = null;
-            return this;
-        }
-
-        internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
-        {
-            // what's my range?
-            var rangeToCheck = new List<IOrderedVariable>();
-            for (var i = MinQuestionId; i <= MaxQuestionId; i++)
-            {
-                rangeToCheck.Add(variables.First(v => v.Id == i));
-            }
-
-            return new FirstWithChoiceConstraint(GetMe(variables), rangeToCheck, Choices, _choiceToCount, _isReverse,
-                _isDeterminedByOwner);
-        }
-
-        internal override void Validate()
-        {
-            var domain = Builder.Domain.Values.ToList();
-            
-            // check type of question
-            if (_isDeterminedByOwner)
-            {
-                if (_choiceToCount != null) throw new Exception($"Same as this one question has a defined answer.");
-            }
-            else
-            {
-                if (_choiceToCount == null) throw new Exception($"First/last with answer has no answer to look for");
-                if (!domain.Contains(_choiceToCount))
-                    throw new Exception(
-                        $"Answer to find {_choiceToCount} not in domain {{{string.Join(",", domain)}}}");
-
-            }
-
-            var badChoices = Choices
-                .Where(choice => choice != null && (choice > MaxQuestionId || choice < MinQuestionId))
-                .Select(v => v!.Value).ToList();
-            if (badChoices.Count > 0)
-            {
+            if (_choiceToCount == null) throw new Exception($"First/last with answer has no answer to look for");
+            if (!domain.Contains(_choiceToCount))
                 throw new Exception(
-                    $"Choices {{{string.Join(",", badChoices)}}} must be between {MinQuestionId} and {MaxQuestionId}, inclusive");
-            }
-
-            ValidateChoices();
+                    $"Answer to find {_choiceToCount} not in domain {{{string.Join(",", domain)}}}");
         }
+
+        var badChoices = Choices
+            .Where(choice => choice != null && (choice > MaxQuestionId || choice < MinQuestionId))
+            .Select(v => v!.Value).ToList();
+        if (badChoices.Count > 0)
+        {
+            throw new Exception(
+                $"Choices {{{string.Join(",", badChoices)}}} must be between {MinQuestionId} and {MaxQuestionId}, inclusive");
+        }
+
+        ValidateChoices();
     }
 }

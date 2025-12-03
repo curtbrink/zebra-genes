@@ -12,6 +12,6 @@ public class OffsetConstraint(IVariable v1, IVariable v2, int offset = 1) : ICon
 
     public IReadOnlyList<IVariable> Scope { get; } = [v1, v2];
 
-    public bool IsSatisfiable(IVariable v, int val, IDictionary<IVariable, IDomain<int>> domains) =>
+    public bool IsSatisfiable(IVariable? v, int val, IDictionary<IVariable, IDomain<int>> domains) =>
         v == v1 ? domains[v2].Values.Contains(val + offset) : domains[v1].Values.Contains(val - offset);
 }

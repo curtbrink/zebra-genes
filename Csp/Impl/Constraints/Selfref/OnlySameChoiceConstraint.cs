@@ -11,13 +11,13 @@ public class OnlySameChoiceConstraint(
     public override string Name => "OnlySameChoice";
     public override string Description => $"Only same answer as {owner.Name} is {owner.Name}={{{OptionString}}}";
     
-    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
+    protected override bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
         // for each option ABCDE in owner's domain, it is supported if:
         // - Q(choices[j]) has j in its domain, AND
         // - no other Q outside of Q(choices[j]) and owner have j forcibly assigned.
 
-        var possibleValues = owner == v ? [val] : domains[owner].Values.ToList();
+        var possibleValues = domains[owner].Values.ToList();
         foreach (var candidate in possibleValues)
         {
             // get target question

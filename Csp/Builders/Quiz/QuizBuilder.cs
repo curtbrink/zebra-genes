@@ -3,37 +3,31 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public partial class QuizBuilder
+public class QuizBuilder : QuestionListBuilder<QuizBuilder>
 {
-    private static List<string> _options =
-        ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
-
-    private readonly int _choiceCount;
-    internal readonly Domain<string> Domain;
     private int _nextQuestionId = 1;
 
-    private readonly List<QuestionBuilder> _questions = [];
-
-    private QuizBuilder(int choiceCount)
+    internal override int MinQuestionId => 1;
+    internal override int MaxQuestionId => _nextQuestionId - 1;
+    
+    private QuizBuilder(int choiceCount) : base(choiceCount)
     {
-        _choiceCount = choiceCount;
-        Domain = new Domain<string>(_options[0..choiceCount]);
     }
 
     public static QuizBuilder New(int size) => new(size);
 
-    public QuestionBuilderInit WhatIsThe() => new(this, _choiceCount, _nextQuestionId++);
+    public QuestionBuilderInit<QuizBuilder> WhatIsThe() => new(this, ChoiceCount, _nextQuestionId++);
 
     public UniformDomainCsp<string> Build()
     {
         // validate each question and build its constraint
         List<IOrderedVariable> variables = [];
-        variables.AddRange(_questions.Select(qb => new OrderedVariable($"Q{qb.QuestionId}", qb.QuestionId)).ToList());
+        variables.AddRange(Questions.Select(qb => new OrderedVariable($"Q{qb.QuestionId}", qb.QuestionId)).ToList());
 
         var constraints = new List<IConstraint<string>>();
-        foreach (var qb in _questions)
+        foreach (var qb in Questions)
         {
-            qb.Validate();
+            qb.Validate(1, _nextQuestionId - 1, Domain.Values.ToList());
             constraints.Add(qb.BuildConstraint(variables));
         }
 

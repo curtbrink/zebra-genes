@@ -1,88 +1,95 @@
 namespace Csp.Builders.Quiz;
 
-public partial class QuizBuilder
+public class QuestionBuilderInit<TParent>(TParent qb, int choiceCount, int questionId)
+    where TParent : QuestionListBuilder<TParent>
 {
-    public class QuestionBuilderInit(QuizBuilder qb, int choiceCount, int questionId)
+    private void Add(QuestionBuilder<TParent> questionBuilder)
     {
-        private void Add(QuestionBuilder questionBuilder)
-        {
-            qb._questions.Add(questionBuilder);
-        }
+        qb.Questions.Add(questionBuilder);
+    }
 
-        // ==== DIRECT MAP QUESTIONS ====
-        public MapChoiceQuestionBuilder AnswerToQuestion(int otherQuestionId)
-        {
-            var b = new MapChoiceQuestionBuilder(qb, choiceCount, questionId, otherQuestionId);
-            Add(b);
-            return b;
-        }
-        
-        // ==== COUNT OF ANSWER QUESTIONS ====
-        public CountOfChoiceQuestionBuilder CountOfAnswer(string answer) => CountOfChoices([answer]);
+    // ==== DIRECT MAP QUESTIONS ====
+    public MapChoiceQuestionBuilder<TParent> AnswerToQuestion(int otherQuestionId)
+    {
+        var b = new MapChoiceQuestionBuilder<TParent>(qb, choiceCount, questionId, otherQuestionId);
+        Add(b);
+        return b;
+    }
 
-        public CountOfChoiceQuestionBuilder CountOfVowels() => CountOfChoices(["A", "E"]);
+    // ==== COUNT OF ANSWER QUESTIONS ====
+    public CountOfChoiceQuestionBuilder<TParent> CountOfAnswer(string answer) => CountOfChoices([answer]);
 
-        public CountOfChoiceQuestionBuilder CountOfConsonants() => CountOfChoices(["B", "C", "D"]);
+    public CountOfChoiceQuestionBuilder<TParent> CountOfVowels() => CountOfChoices(["A", "E"]);
 
-        private CountOfChoiceQuestionBuilder CountOfChoices(List<string> choices)
-        {
-            var b = new CountOfChoiceQuestionBuilder(qb, choiceCount, questionId, choices);
-            Add(b);
-            return b;
-        }
-        
-        // ==== FIRST QUESTION WITH ANSWER QUESTIONS ====
-        public FirstWithChoiceQuestionBuilder First() => FirstWithChoice(false, false);
+    public CountOfChoiceQuestionBuilder<TParent> CountOfConsonants() => CountOfChoices(["B", "C", "D"]);
 
-        public FirstWithChoiceQuestionBuilder Last() => FirstWithChoice(true, false);
-        
-        public FirstWithChoiceQuestionBuilder Next() => FirstWithChoice(false, true);
-        
-        public FirstWithChoiceQuestionBuilder Previous() => FirstWithChoice(true, true);
+    private CountOfChoiceQuestionBuilder<TParent> CountOfChoices(List<string> choices)
+    {
+        var b = new CountOfChoiceQuestionBuilder<TParent>(qb, choiceCount, questionId, choices);
+        Add(b);
+        return b;
+    }
 
-        private FirstWithChoiceQuestionBuilder FirstWithChoice(bool isReverse, bool isNext)
-        {
-            var b = new FirstWithChoiceQuestionBuilder(qb, choiceCount, questionId, isReverse, isNext);
-            Add(b);
-            return b;
-        }
+    // ==== FIRST QUESTION WITH ANSWER QUESTIONS ====
+    public FirstWithChoiceQuestionBuilder<TParent> First() => FirstWithChoice(false, false);
 
-        // ==== MOST/LEAST COMMON/COUNT OF MOST COMMON QUESTIONS ====
-        public MostLeastCommonQuestionBuilder MostCommonAnswer()
-        {
-            var b = new MostLeastCommonQuestionBuilder(qb, choiceCount, questionId, false);
-            Add(b);
-            return b;
-        }
+    public FirstWithChoiceQuestionBuilder<TParent> Last() => FirstWithChoice(true, false);
 
-        public MostLeastCommonQuestionBuilder LeastCommonAnswer()
-        {
-            var b = new MostLeastCommonQuestionBuilder(qb, choiceCount, questionId, true);
-            Add(b);
-            return b;
-        }
+    public FirstWithChoiceQuestionBuilder<TParent> Next() => FirstWithChoice(false, true);
 
-        public MostCommonCountQuestionBuilder CountOfMostCommonAnswer()
-        {
-            var b = new MostCommonCountQuestionBuilder(qb, choiceCount, questionId);
-            Add(b);
-            return b;
-        }
+    public FirstWithChoiceQuestionBuilder<TParent> Previous() => FirstWithChoice(true, true);
 
-        // ==== ONLY CONSECUTIVE N QUESTIONS ====
-        public OnlyConsecutiveSameQuestionBuilder OnlyConsecutiveSameSetOf(int n)
-        {
-            var b = new OnlyConsecutiveSameQuestionBuilder(qb, choiceCount, questionId, n);
-            Add(b);
-            return b;
-        }
+    private FirstWithChoiceQuestionBuilder<TParent> FirstWithChoice(bool isReverse, bool isNext)
+    {
+        var b = new FirstWithChoiceQuestionBuilder<TParent>(qb, choiceCount, questionId, isReverse, isNext);
+        Add(b);
+        return b;
+    }
 
-        // ==== ONLY QUESTION WITH SAME ANSWER QUESTIONS ==== 
-        public OnlySameChoiceQuestionBuilder OnlyQuestionWithTheSameAnswer()
-        {
-            var b = new OnlySameChoiceQuestionBuilder(qb, choiceCount, questionId);
-            Add(b);
-            return b;
-        }
+    // ==== MOST/LEAST COMMON/COUNT OF MOST COMMON QUESTIONS ====
+    public MostLeastCommonQuestionBuilder<TParent> MostCommonAnswer()
+    {
+        var b = new MostLeastCommonQuestionBuilder<TParent>(qb, choiceCount, questionId, false);
+        Add(b);
+        return b;
+    }
+
+    public MostLeastCommonQuestionBuilder<TParent> LeastCommonAnswer()
+    {
+        var b = new MostLeastCommonQuestionBuilder<TParent>(qb, choiceCount, questionId, true);
+        Add(b);
+        return b;
+    }
+
+    public MostCommonCountQuestionBuilder<TParent> CountOfMostCommonAnswer()
+    {
+        var b = new MostCommonCountQuestionBuilder<TParent>(qb, choiceCount, questionId);
+        Add(b);
+        return b;
+    }
+
+    // ==== ONLY CONSECUTIVE N QUESTIONS ====
+    public OnlyConsecutiveSameQuestionBuilder<TParent> OnlyConsecutiveSameSetOf(int n)
+    {
+        var b = new OnlyConsecutiveSameQuestionBuilder<TParent>(qb, choiceCount, questionId, n);
+        Add(b);
+        return b;
+    }
+
+    // ==== ONLY QUESTION WITH SAME ANSWER QUESTIONS ==== 
+    public OnlySameChoiceQuestionBuilder<TParent> OnlyQuestionWithTheSameAnswer()
+    {
+        var b = new OnlySameChoiceQuestionBuilder<TParent>(qb, choiceCount, questionId);
+        Add(b);
+        return b;
+    }
+    
+    // ==== ONLY TRUE STATEMENT QUESTIONS ====
+    public OnlyTrueStatementQuestionBuilder<TParent>.OnlyTrueStatementListBuilder OnlyTrueStatement()
+    {
+        // slightly different since we get a list builder
+        var lb = OnlyTrueStatementQuestionBuilder<TParent>.New(qb, choiceCount, questionId);
+        Add(lb.Parent); // but we can still access the wrapper question builder
+        return lb;
     }
 }

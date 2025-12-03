@@ -14,6 +14,6 @@ public class OneOfConstraint(IVariable owner, List<int> allowedValues) : IConstr
 
     private bool _isSingleton = allowedValues.Count == 1;
 
-    public bool IsSatisfiable(IVariable v, int val, IDictionary<IVariable, IDomain<int>> domains) =>
+    public bool IsSatisfiable(IVariable? v, int val, IDictionary<IVariable, IDomain<int>> domains) =>
         allowedValues.Contains(val);
 }

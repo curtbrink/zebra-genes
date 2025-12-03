@@ -31,7 +31,7 @@ public static class Gac
         foreach (var vValue in firstVariableDomain.Values.ToList())
         {
             Console.WriteLine($"[SEARCH] Looking for possible solutions with {firstVariableWithMin.Name}={vValue} ...");
-            var domainCopy = DeepCopyDomains(domains);
+            var domainCopy = DeepCopy.Domains(domains);
             
             // hard set that question's choice to vValue
             domainCopy[firstVariableWithMin] = new Domain<T>([vValue]);
@@ -64,18 +64,7 @@ public static class Gac
         Console.WriteLine($"[SEARCH] No valid solutions found for {firstVariableWithMin.Name} here!");
         throw new ContradictionException($"Could not find a valid solution for {firstVariableWithMin.Name}");
     }
-
-    private static IDictionary<IVariable, IDomain<T>> DeepCopyDomains<T>(IDictionary<IVariable, IDomain<T>> domains)
-    {
-        var newDict = new Dictionary<IVariable, IDomain<T>>();
-        foreach (var v in domains.Keys)
-        {
-            newDict[v] = new Domain<T>(domains[v].Values.ToList());
-        }
-
-        return newDict;
-    }
-
+    
     public static IDictionary<IVariable, IDomain<T>> Run<T>(ICollection<IConstraint<T>> constraints, IDictionary<IVariable, IDomain<T>> domains)
     {
         var queue = new Queue<(IConstraint<T>, IVariable)>();

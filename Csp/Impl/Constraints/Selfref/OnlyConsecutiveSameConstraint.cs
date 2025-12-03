@@ -16,21 +16,21 @@ public class OnlyConsecutiveSameConstraint(
     
     private readonly int _consecutiveN = choiceList.ElementAt(0).Count;
 
-    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
+    protected override bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
         // is there at least one supported answer in owner's domain?
         // supported if:
         //  - the Q's in that answer have a potential shared answer
         //  - no other consecutive set of N is _forced_
 
-        var possibleAnswers = v == owner ? [val] : domains[owner].Values.ToList();
+        var possibleAnswers = domains[owner].Values.ToList();
         foreach (var candidate in possibleAnswers)
         {
             // can this set of questions all be equal?
             var candidateSlice = ChoiceList[candidate];
             var firstId = candidateSlice.Min();
             var sliceDomains = candidateSlice.Select(c => scope.First(va => va.Id == c))
-                .Select(ov => ov == v ? [val] : domains[ov].Values.ToList()).ToList();
+                .Select(ov => domains[ov].Values.ToList()).ToList();
             var intersection = sliceDomains[0];
             for (var i = 1; i < sliceDomains.Count; i++)
             {
@@ -41,7 +41,7 @@ public class OnlyConsecutiveSameConstraint(
             
             // is there a forced pair anywhere else?
             var isValid = true;
-            for (var i = 1; i <= Scope.Count - (_consecutiveN - 1); i++)
+            for (var i = 1; i <= QuestionScope.Count - (_consecutiveN - 1); i++)
             {
                 if (i == firstId) continue; // this is our valid one!
 
@@ -52,14 +52,13 @@ public class OnlyConsecutiveSameConstraint(
                 }
 
                 var otherSliceDomains = list.Select(id => scope.First(va => va.Id == id))
-                    .Select(ov => ov == v ? [val] : domains[ov].Values.ToList()).ToList();
+                    .Select(ov => domains[ov].Values.ToList()).ToList();
 
                 if (otherSliceDomains.Any(d => d.Count > 1)) continue;
                 
                 var firstAnswer = otherSliceDomains[0][0];
 
                 if (otherSliceDomains.Any(d => !d.Contains(firstAnswer))) continue;
-                
                 
                 isValid = false;
                 break;

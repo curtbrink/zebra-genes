@@ -4,8 +4,8 @@ using Csp.Interfaces;
 namespace Csp.Impl.Constraints.Selfref;
 
 public class MostLeastCommonConstraint(
-    IVariable owner,
-    IEnumerable<IVariable> scope,
+    IOrderedVariable owner,
+    IEnumerable<IOrderedVariable> scope,
     IEnumerable<string?> choiceList,
     bool isLeastCommon = false,
     bool isMostCommonCount = false) : BaseSelfRefConstraint<string?>(scope, choiceList)
@@ -15,7 +15,7 @@ public class MostLeastCommonConstraint(
 
     private readonly string _descriptor = isLeastCommon ? "Least" : "Most";
     
-    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
+    protected override bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
         // first step: count all actuals and hypotheticals
         // initialize dicts
@@ -30,9 +30,9 @@ public class MostLeastCommonConstraint(
 
         List<string> ownerOptions = [];
 
-        foreach (var question in Scope)
+        foreach (var question in QuestionScope)
         {
-            var qDomain = question == v ? [val] : domains[question].Values.ToList();
+            var qDomain = domains[question].Values.ToList();
             if (question == owner)
             {
                 // we'll have to check for these
@@ -144,7 +144,7 @@ public class MostLeastCommonConstraint(
                 var assignedCount = optionSubset.Count * t;
                 
                 // short circuit if we know this won't work
-                if (assignedCount > Scope.Count)
+                if (assignedCount > QuestionScope.Count)
                 {
                     continue;
                 }
@@ -183,7 +183,7 @@ public class MostLeastCommonConstraint(
                     upperBoundTotal += optionUpperBound;
                 }
                 // now see if our totals can produce a valid solution
-                if (isValid && lowerBoundTotal <= Scope.Count && Scope.Count <= upperBoundTotal)
+                if (isValid && lowerBoundTotal <= QuestionScope.Count && QuestionScope.Count <= upperBoundTotal)
                 {
                     return true;
                 }

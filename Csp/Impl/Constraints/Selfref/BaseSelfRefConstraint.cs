@@ -1,33 +1,41 @@
-using System.Collections;
+using Csp.Helpers;
 using Csp.Interfaces;
 
 namespace Csp.Impl.Constraints.Selfref;
 
-// represents a generic logiquiz-type question constraint with ABCDE values mapped to something
-public abstract class BaseSelfRefConstraint<T> : IConstraint<string>
+public abstract class BaseSelfRefConstraint : IConstraint<string>
 {
     protected readonly IList<string> Options = ["A", "B", "C", "D", "E"];
-    protected readonly IDictionary<string, T> ChoiceList;
-
-    protected string OptionString => string.Join("|", OptionListItems);
-
-    private List<string> OptionListItems =>
-        ChoiceList.Keys.Select(k => $"{k}={(ChoiceList[k] is null ? "None" : ChoiceList[k])}").ToList();
     
     public abstract string Name { get; }
     public abstract string Description { get; }
-    public IReadOnlyList<IVariable> Scope { get; }
+    
+    public abstract IReadOnlyList<IVariable> Scope { get; }
 
-    protected BaseSelfRefConstraint(IEnumerable<IVariable> scope, IEnumerable<T> choiceList)
+    public bool IsSatisfiable(IVariable? v, string? val, IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
-        Scope = scope.ToList();
-        ChoiceList = new Dictionary<string, T>();
-        var cs = choiceList.ToList();
-        for (var i = 0; i < cs.Count; i++)
-        {
-            ChoiceList[Options[i]] = cs[i];
-        }
+        var newDomains = DeepCopy.ToOrderedDomains(domains);
+        return IsSatisfiableWithNewDomains(v, val, newDomains);
+    }
+    
+    public bool IsSatisfiable(IVariable? v, string? val, IDictionary<IVariable, IDomain<string>> domains)
+    {
+        var newDomains = DeepCopy.ToOrderedDomains(domains);
+        return IsSatisfiableWithNewDomains(v, val, newDomains);
     }
 
-    public abstract bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains);
+    private bool IsSatisfiableWithNewDomains(IVariable? v, string? val,
+        IDictionary<IOrderedVariable, IDomain<string>> domains)
+    {
+        if (v is not null && val is not null)
+        {
+            if (v is not IOrderedVariable orderedV)
+                throw new ArgumentOutOfRangeException(nameof(v), "Owner variable must be ordered variable");
+            domains[orderedV] = new Domain<string>([val]);
+        }
+
+        return IsSatisfiableInternal(domains);
+    }
+
+    protected abstract bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains);
 }

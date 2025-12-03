@@ -30,12 +30,12 @@ public class FirstWithChoiceConstraint(
 
     private readonly List<IOrderedVariable> _window = rangeToCheck.ToList();
     
-    public override bool IsSatisfiable(IVariable v, string val, IDictionary<IVariable, IDomain<string>> domains)
+    protected override bool IsSatisfiableInternal(IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
         // make sure we have a sort
         _window.Sort(_comparer);
 
-        var ownerOptions = v == owner ? [val] : domains[owner].Values.ToList();
+        var ownerOptions = domains[owner].Values.ToList();
         foreach (var candidate in ownerOptions)
         {
             var firstQId = ChoiceList[candidate];
@@ -43,7 +43,7 @@ public class FirstWithChoiceConstraint(
             if (firstQId == null)
             {
                 // check that every Q can be assigned to not expected
-                if (_window.All(q => (q == v ? [val] : domains[q].Values.ToList()).Any(o => o != valueToCheck)))
+                if (_window.All(q => domains[q].Values.Any(o => o != valueToCheck)))
                 {
                     // found one
                     return true;
@@ -57,8 +57,7 @@ public class FirstWithChoiceConstraint(
             var targetIdx = _window.FindIndex(q => q.Id == firstQId);
             var targetQ = _window[targetIdx];
 
-            var targetQDomain = targetQ == v ? [val] : domains[targetQ].Values.ToList();
-            if (!targetQDomain.Contains(valueToCheck!))
+            if (!domains[targetQ].Values.Contains(valueToCheck!))
             {
                 continue; // not supported if it can't even be that option
             }
@@ -68,7 +67,7 @@ public class FirstWithChoiceConstraint(
             for (var i = 0; i < targetIdx; i++)
             {
                 var qi =  _window[i];
-                var qiDomain = qi == v ? [val] :  domains[qi].Values.ToList();
+                var qiDomain = domains[qi].Values.ToList();
                 if (qiDomain.Count == 1 && qiDomain[0] == valueToCheck!)
                 {
                     supported = false;

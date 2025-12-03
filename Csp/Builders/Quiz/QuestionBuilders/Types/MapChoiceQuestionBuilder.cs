@@ -3,40 +3,38 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public partial class QuizBuilder
+public class MapChoiceQuestionBuilder<TParent> : QuestionBuilder<string, MapChoiceQuestionBuilder<TParent>, TParent>
+    where TParent : QuestionListBuilder<TParent>
 {
-    public class MapChoiceQuestionBuilder : QuestionBuilder<string, MapChoiceQuestionBuilder>
+    private readonly int _mapToQuestionId;
+
+    internal MapChoiceQuestionBuilder(TParent qb, int choiceCount, int questionId, int otherQuestionId) : base(
+        qb, choiceCount, questionId)
     {
-        private readonly int _mapToQuestionId;
+        _mapToQuestionId = otherQuestionId;
+    }
 
-        internal MapChoiceQuestionBuilder(QuizBuilder qb, int choiceCount, int questionId, int otherQuestionId) : base(
-            qb, choiceCount, questionId)
+    internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
+    {
+        var other = variables.First(v => v.Id == _mapToQuestionId);
+        return new ChoiceEqualsConstraint(GetMe(variables), other, Choices);
+    }
+
+    internal override void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true)
+    {
+        if (!shouldValidate) return;
+        
+        if (_mapToQuestionId < minQ || _mapToQuestionId > maxQ)
         {
-            _mapToQuestionId = otherQuestionId;
+            throw new Exception($"Question #{_mapToQuestionId} not found");
+        }
+        var badChoices = Choices.Where(c => !domain.Contains(c)).ToList();
+        if (badChoices.Count > 0)
+        {
+            throw new Exception(
+                $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", domain)}}}");
         }
 
-        internal override IConstraint<string> BuildConstraint(List<IOrderedVariable> variables)
-        {
-            var other = variables.First(v => v.Id == _mapToQuestionId);
-            return new ChoiceEqualsConstraint(GetMe(variables), other, Choices);
-        }
-
-        internal override void Validate()
-        {
-            if (Builder._nextQuestionId <= _mapToQuestionId)
-            {
-                throw new Exception($"Question #{_mapToQuestionId} not found");
-            }
-
-            var domain = Builder.Domain.Values.ToList();
-            var badChoices = Choices.Where(c => !Builder.Domain.Values.Contains(c)).ToList();
-            if (badChoices.Count > 0)
-            {
-                throw new Exception(
-                    $"Choices {{{string.Join(",", badChoices)}}} are not in domain {{{string.Join(",", domain)}}}");
-            }
-
-            ValidateChoices();
-        }
+        ValidateChoices();
     }
 }

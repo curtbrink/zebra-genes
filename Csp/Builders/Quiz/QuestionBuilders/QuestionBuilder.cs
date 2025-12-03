@@ -2,20 +2,25 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public partial class QuizBuilder
+public abstract class QuestionBuilder<TParent> : SelfRefBuilder<QuestionBuilder<TParent>>
+    where TParent : QuestionListBuilder<TParent>
 {
-    public abstract class QuestionBuilder(QuizBuilder qb, int choiceCount, int questionId)
+    internal int QuestionId;
+    protected TParent Builder;
+    protected int ChoiceCount;
+    
+    internal QuestionBuilder(TParent qb, int choiceCount, int questionId)
     {
-        internal int QuestionId = questionId;
-        protected QuizBuilder Builder = qb;
-        protected int ChoiceCount = choiceCount;
-
-        internal abstract IConstraint<string> BuildConstraint(List<IOrderedVariable> variables);
-        internal abstract void Validate();
-
-        public QuizBuilder EndQuestion() => Builder;
-
-        protected IOrderedVariable GetMe(List<IOrderedVariable> variables) =>
-            variables.First(v => v.Id == QuestionId);
+        Builder = qb;
+        ChoiceCount = choiceCount;
+        QuestionId = questionId;
     }
+
+    internal abstract IConstraint<string> BuildConstraint(List<IOrderedVariable> variables);
+    internal abstract void Validate(int minQ, int maxQ, List<string> domain, bool shouldValidate = true);
+
+    public TParent EndQuestion() => Builder;
+
+    protected IOrderedVariable GetMe(List<IOrderedVariable> variables) =>
+        variables.First(v => v.Id == QuestionId);
 }
