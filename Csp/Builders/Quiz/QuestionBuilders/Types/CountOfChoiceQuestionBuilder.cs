@@ -4,7 +4,7 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    CountOfChoiceQuestionBuilder<TParent> : QuestionBuilder<int, CountOfChoiceQuestionBuilder<TParent>, TParent>
+    CountOfChoiceQuestionBuilder<TParent> : QuestionBuilder<int, TParent, CountOfChoiceQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     private readonly List<string> _choicesToCount;

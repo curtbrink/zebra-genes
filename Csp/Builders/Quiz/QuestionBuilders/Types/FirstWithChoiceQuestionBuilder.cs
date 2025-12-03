@@ -4,7 +4,7 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    FirstWithChoiceQuestionBuilder<TParent> : QuestionBuilder<int?, FirstWithChoiceQuestionBuilder<TParent>, TParent>
+    FirstWithChoiceQuestionBuilder<TParent> : QuestionBuilder<int?, TParent, FirstWithChoiceQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     private readonly bool _isReverse;

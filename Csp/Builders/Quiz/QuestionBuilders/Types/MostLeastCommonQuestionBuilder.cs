@@ -4,7 +4,7 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    MostLeastCommonQuestionBuilder<TParent> : QuestionBuilder<string?, MostLeastCommonQuestionBuilder<TParent>, TParent>
+    MostLeastCommonQuestionBuilder<TParent> : QuestionBuilder<string?, TParent, MostLeastCommonQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     private readonly bool _isLeast;

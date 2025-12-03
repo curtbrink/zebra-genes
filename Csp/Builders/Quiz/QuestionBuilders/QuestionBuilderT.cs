@@ -1,19 +1,19 @@
 namespace Csp.Builders.Quiz;
 
-public abstract class QuestionBuilder<T, TMe, TParent> : QuestionBuilder<TParent>
-    where TMe : QuestionBuilder<T, TMe, TParent>
+public abstract class QuestionBuilder<TData, TParent, TSelf> : QuestionBuilder<TParent>
     where TParent : QuestionListBuilder<TParent>
+    where TSelf : QuestionBuilder<TData, TParent, TSelf>
 {
-    protected readonly List<T> Choices = [];
+    protected readonly List<TData> Choices = [];
 
     internal QuestionBuilder(TParent qb, int choiceCount, int questionId) : base(qb, choiceCount, questionId)
     {
     }
 
-    public TMe WithChoices(params T[] choices)
+    public TSelf WithChoices(params TData[] choices)
     {
         Choices.AddRange(choices);
-        return (TMe)this;
+        return (TSelf)this;
     }
 
     protected void ValidateChoices()

@@ -2,7 +2,7 @@ using Csp.Impl;
 
 namespace Csp.Builders.Quiz;
 
-public abstract class QuestionListBuilder<TSelf> : SelfRefBuilder<QuestionListBuilder<TSelf>> 
+public abstract class QuestionListBuilder<TSelf> : SelfRefBuilder<TSelf> 
     where TSelf : QuestionListBuilder<TSelf>
 {
     private readonly List<string> _options =

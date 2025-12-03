@@ -4,8 +4,8 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    OnlyTrueStatementQuestionBuilder<TParent> : QuestionBuilder<BaseSelfRefConstraint,
-    OnlyTrueStatementQuestionBuilder<TParent>, TParent> where TParent : QuestionListBuilder<TParent>
+    OnlyTrueStatementQuestionBuilder<TParent> : QuestionBuilder<BaseSelfRefConstraint, TParent,
+    OnlyTrueStatementQuestionBuilder<TParent>> where TParent : QuestionListBuilder<TParent>
 {
     private OnlyTrueStatementListBuilder? _child;
 
@@ -23,7 +23,7 @@ public class
     {
         if (typeof(TParent) != typeof(QuizBuilder))
             throw new ArgumentOutOfRangeException(nameof(qb), "Only true statement questions cannot be nested.");
-        
+
         var questionBuilder = new OnlyTrueStatementQuestionBuilder<TParent>(qb, choiceCount, questionId);
         var listBuilder = new OnlyTrueStatementListBuilder(questionBuilder);
         questionBuilder.SetListBuilder(listBuilder);

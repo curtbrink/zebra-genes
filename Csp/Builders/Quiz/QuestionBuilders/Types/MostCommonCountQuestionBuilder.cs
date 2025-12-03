@@ -4,7 +4,7 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    MostCommonCountQuestionBuilder<TParent> : QuestionBuilder<int, MostCommonCountQuestionBuilder<TParent>, TParent>
+    MostCommonCountQuestionBuilder<TParent> : QuestionBuilder<int, TParent, MostCommonCountQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     internal MostCommonCountQuestionBuilder(TParent qb, int choiceCount, int questionId) :

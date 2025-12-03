@@ -2,8 +2,7 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public abstract class QuestionBuilder<TParent> : SelfRefBuilder<QuestionBuilder<TParent>>
-    where TParent : QuestionListBuilder<TParent>
+public abstract class QuestionBuilder<TParent> where TParent : QuestionListBuilder<TParent>
 {
     internal int QuestionId;
     protected TParent Builder;

@@ -4,7 +4,7 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    OnlySameChoiceQuestionBuilder<TParent> : QuestionBuilder<int, OnlySameChoiceQuestionBuilder<TParent>, TParent>
+    OnlySameChoiceQuestionBuilder<TParent> : QuestionBuilder<int, TParent, OnlySameChoiceQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     internal OnlySameChoiceQuestionBuilder(TParent qb, int choiceCount, int questionId) : base(qb, choiceCount,

@@ -4,8 +4,8 @@ using Csp.Interfaces;
 namespace Csp.Builders.Quiz;
 
 public class
-    OnlyConsecutiveSameQuestionBuilder<TParent> : QuestionBuilder<int, OnlyConsecutiveSameQuestionBuilder<TParent>,
-    TParent> where TParent : QuestionListBuilder<TParent>
+    OnlyConsecutiveSameQuestionBuilder<TParent> : QuestionBuilder<int, TParent,
+    OnlyConsecutiveSameQuestionBuilder<TParent>> where TParent : QuestionListBuilder<TParent>
 {
     private readonly int _consecutiveSameSize;
 

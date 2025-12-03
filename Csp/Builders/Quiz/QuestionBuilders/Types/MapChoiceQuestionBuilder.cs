@@ -3,7 +3,7 @@ using Csp.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
-public class MapChoiceQuestionBuilder<TParent> : QuestionBuilder<string, MapChoiceQuestionBuilder<TParent>, TParent>
+public class MapChoiceQuestionBuilder<TParent> : QuestionBuilder<string, TParent, MapChoiceQuestionBuilder<TParent>>
     where TParent : QuestionListBuilder<TParent>
 {
     private readonly int _mapToQuestionId;
