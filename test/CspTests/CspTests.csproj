@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Generator\Generator.csproj" />
+      <ProjectReference Include="..\..\src\Csp\Csp.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes", "Zebra\ZebraGenes.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes", "src\Zebra\ZebraGenes.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp", "Csp\Csp.csproj", "{E863D634-6E1D-4466-8DAC-3153D3B4B053}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp", "src\Csp\Csp.csproj", "{E863D634-6E1D-4466-8DAC-3153D3B4B053}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CspTests", "CspTests\CspTests.csproj", "{FEABC34C-A489-42CE-9D28-36A9248BCDBD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CspTests", "test\CspTests\CspTests.csproj", "{FEABC34C-A489-42CE-9D28-36A9248BCDBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "Generator\Generator.csproj", "{7CFCDDE8-352C-4496-99F5-E06D92C7F514}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "src\Generator\Generator.csproj", "{7CFCDDE8-352C-4496-99F5-E06D92C7F514}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratorTests", "GeneratorTests\GeneratorTests.csproj", "{13F9388B-A2EA-4D7E-960F-9F67E12653D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratorTests", "test\GeneratorTests\GeneratorTests.csproj", "{13F9388B-A2EA-4D7E-960F-9F67E12653D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
