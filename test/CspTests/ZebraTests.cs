@@ -132,4 +132,33 @@ public class ZebraTests
 
         var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
     }
+
+    [Fact]
+    public void TestZebraBuilder6()
+    {
+        var (z, _) = ZebraBuilder.Create(4)
+            .AddCategory("Shirt", ["green", "orange", "purple", "white"])
+            .AddCategory("Name", ["George", "Oliver", "Walter", "Xavier"])
+            .AddCategory("Size", ["20gal", "25gal", "35gal", "45gal"])
+            .AddCategory("Shape", ["cylinder", "hexagon", "rectangle", "square"])
+            .AddConstraint("rectangle").MustBeInPosition(2)
+            .AddConstraint("square").MustBeInPosition(1)
+            .AddConstraint("35gal").MustBeInPosition(3)
+            .AddConstraint("orange").IsBefore("George")
+            .AddConstraint("white").MustBeInPosition(1)
+            .AddConstraint("35gal").IsAdjacentTo("hexagon")
+            .AddConstraint("Oliver").IsAdjacentTo("45gal")
+            .AddConstraint("green").Is("35gal")
+            .AddConstraint("Oliver").MustBeInPosition([1, 4])
+            .AddConstraint("20gal").MustBeInPosition(4)
+            .AddConstraint("Walter").Is("hexagon")
+            .Build();
+        
+        var workingDomains = new Dictionary<IVariable, IDomain<int>>(z.Domains);
+        var workingConstraints = z.Constraints.ToList();
+        
+        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
+
+        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+    }
 }
