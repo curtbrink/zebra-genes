@@ -1,23 +1,23 @@
 using Generator.Zebra.Clues.Abstract;
+using Generator.Zebra.Types;
 
 namespace Generator.Zebra.Clues.Types;
 
-public record AttributesAreEqualClue(string Category1, string Value1, string Category2, string Value2)
-    : BinaryAttributeClue(Category1, Value1, Category2, Value2)
+public record AttributesAreEqualClue(ZebraAttribute Attribute1, ZebraAttribute Attribute2)
+    : BinaryAttributeClue(Attribute1, Attribute2)
 {
-    public override bool IsEquivalentTo(Clue? other) =>
+    public override bool IsEquivalentTo(ZebraClue? other) =>
         other is AttributesAreEqualClue aec && InvolvesSameAttributes(aec);
 
-    public override bool Contradicts(Clue? other)
+    public override bool Contradicts(ZebraClue? other)
     {
         if (other is null || IsEquivalentTo(other)) return false;
 
         return other switch
         {
             AttributesAreEqualClue aec => ContradictsAttributeEquals(aec),
-            AttributeIsBeforeClue aibc => InvolvesSameAttributes(aibc),
+            OrderedBinaryAttributeClue obac => InvolvesSameAttributes(obac),
             AttributesAreAdjacentClue aiac => InvolvesSameAttributes(aiac),
-            AttributeIsImmediatelyBeforeClue aiibc => InvolvesSameAttributes(aiibc),
             _ => false
         };
     }
@@ -25,26 +25,22 @@ public record AttributesAreEqualClue(string Category1, string Value1, string Cat
     private bool ContradictsAttributeEquals(AttributesAreEqualClue aec)
     {
         // known different attribute equals...
-        // one attribute must be the same
-        if (AttributesAreEqual(A, aec.A)) // a = otherA
+        // a contradicts b in this case if exactly one attribute matches in a and b and the others are exclusive
+        if (Attribute1 == aec.Attribute1)
         {
-            // contradiction if b.category == otherB.category && b.value != otherB.value
-            return AttributesAreDifferentValueInSameCategory(B, aec.B);
+            return Attribute2.IsExclusiveWith(aec.Attribute2);
         }
-        if (AttributesAreEqual(A, aec.B)) // a = otherB
+        if (Attribute1 == aec.Attribute2)
         {
-            // contradiction if b.category == otherA.category && b.value != otherA.value
-            return AttributesAreDifferentValueInSameCategory(B, aec.A);
+            return Attribute2.IsExclusiveWith(aec.Attribute1);
         }
-        if (AttributesAreEqual(B, aec.A)) // b = otherA
+        if (Attribute2 == aec.Attribute1)
         {
-            // contradiction if a.category == otherB.category && a.value != otherB.value
-            return AttributesAreDifferentValueInSameCategory(A, aec.B);
+            return Attribute1.IsExclusiveWith(aec.Attribute2);
         }
-        if (AttributesAreEqual(B, aec.B)) // b = otherB
+        if (Attribute2 == aec.Attribute2)
         {
-            // contradiction if a.category == otherA.category && a.value != otherA.value
-            return AttributesAreDifferentValueInSameCategory(A, aec.A);
+            return Attribute1.IsExclusiveWith(aec.Attribute1);
         }
         // else there isn't a matching attribute
         return false;

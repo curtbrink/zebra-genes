@@ -1,16 +1,19 @@
 using Generator.Zebra.Clues.Types;
+using Generator.Zebra.Types;
 
 namespace Generator.Zebra.Clues.Abstract;
 
-public abstract record OrderedBinaryAttributeClue<T>(string Category1, string Value1, string Category2, string Value2)
-    : BinaryAttributeClue(Category1, Value1, Category2, Value2)
-    where T : OrderedBinaryAttributeClue<T>
+public abstract record OrderedBinaryAttributeClue(ZebraAttribute Attribute1, ZebraAttribute Attribute2)
+    : BinaryAttributeClue(Attribute1, Attribute2);
+
+public abstract record OrderedBinaryAttributeClue<TSelf>(ZebraAttribute Attribute1, ZebraAttribute Attribute2)
+    : OrderedBinaryAttributeClue(Attribute1, Attribute2)
+    where TSelf : OrderedBinaryAttributeClue<TSelf>
 {
-    public override bool IsEquivalentTo(Clue? other) =>
-        other is T otherT && AttributesAreEqual(A, otherT.A) && AttributesAreEqual(B, otherT.B);
+    public override bool IsEquivalentTo(ZebraClue? other) => this == other; // must match type and order exactly
     
     // order matters for the before clues
-    public override bool Contradicts(Clue? other)
+    public override bool Contradicts(ZebraClue? other)
     {
         if (other is not BinaryAttributeClue bac || IsEquivalentTo(bac)) return false;
 
@@ -25,7 +28,6 @@ public abstract record OrderedBinaryAttributeClue<T>(string Category1, string Va
         };
     }
 
-    private bool ContradictsOrder<TOther>(OrderedBinaryAttributeClue<TOther> other)
-        where TOther : OrderedBinaryAttributeClue<TOther> =>
-        AttributesAreEqual(A, other.B) && AttributesAreEqual(B, other.A);
+    private bool ContradictsOrder(OrderedBinaryAttributeClue other) =>
+        Attribute1 == other.Attribute2 && Attribute2 == other.Attribute1;
 }

@@ -1,11 +1,12 @@
 using Generator.Zebra.Clues.Abstract;
+using Generator.Zebra.Types;
 
 namespace Generator.Zebra.Clues.Types;
 
-public record AttributeIsImmediatelyBeforeClue(string Category1, string Value1, string Category2, string Value2)
-    : OrderedBinaryAttributeClue<AttributeIsImmediatelyBeforeClue>(Category1, Value1, Category2, Value2)
+public record AttributeIsImmediatelyBeforeClue(ZebraAttribute Attribute1, ZebraAttribute Attribute2)
+    : OrderedBinaryAttributeClue<AttributeIsImmediatelyBeforeClue>(Attribute1, Attribute2)
 {
-    public override bool Contradicts(Clue? other)
+    public override bool Contradicts(ZebraClue? other)
     {
         // the same set of contradictions as "before" clues applies 
         if (base.Contradicts(other)) return true;
@@ -17,20 +18,20 @@ public record AttributeIsImmediatelyBeforeClue(string Category1, string Value1, 
         // but "A:x is immediately before C:1" can still be true,
         // and "D:2 is immediately before B:y" can still be true.
         if (other is not AttributeIsImmediatelyBeforeClue aiibc) return false;
-        if (AttributesAreEqual(A, aiibc.A))
+        if (Attribute1 == aiibc.Attribute1)
         {
-            return AttributesAreDifferentValueInSameCategory(B, aiibc.B);
+            return Attribute2.IsExclusiveWith(aiibc.Attribute2);
         }
 
-        if (AttributesAreEqual(B, aiibc.B))
+        if (Attribute2 == aiibc.Attribute2)
         {
-            return AttributesAreDifferentValueInSameCategory(A, aiibc.A);
+            return Attribute1.IsExclusiveWith(aiibc.Attribute1);
         }
 
         return false;
     }
 
-    public override bool Implies(Clue? other)
+    public override bool Implies(ZebraClue? other)
     {
         if (base.Implies(other)) return true;
         
@@ -38,7 +39,7 @@ public record AttributeIsImmediatelyBeforeClue(string Category1, string Value1, 
 
         return bac switch
         {
-            AttributeIsBeforeClue aibc => AttributesAreEqual(A, aibc.A) && AttributesAreEqual(B, aibc.B),
+            AttributeIsBeforeClue aibc => Attribute1 == aibc.Attribute1 && Attribute2 == aibc.Attribute2,
             AttributesAreAdjacentClue aaac => InvolvesSameAttributes(aaac),
             _ => false
         };

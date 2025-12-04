@@ -1,12 +1,12 @@
+using Generator.Zebra.Types;
+
 namespace Generator.Zebra.Clues.Abstract;
 
-public abstract record UnaryAttributeClue(string Category, string Value) : Clue
+public abstract record UnaryAttributeClue(ZebraAttribute Attribute) : ZebraClue
 {
-    public (string, string) A => (Category, Value);
+    protected bool InvolvesSameAttribute(ZebraClue? clue2) =>
+        clue2 is UnaryAttributeClue uac2 && Attribute == uac2.Attribute;
 
-    protected bool InvolvesSameAttribute(Clue? clue2) =>
-        clue2 is UnaryAttributeClue uac2 && AttributesAreEqual(A, uac2.A);
-
-    protected bool InvolvesDifferentAttributeInSameCategory(Clue? clue2) =>
-        clue2 is UnaryAttributeClue uac2 && AttributesAreDifferentValueInSameCategory(A, uac2.A);
+    protected bool InvolvesExclusiveAttribute(ZebraClue? clue2) =>
+        clue2 is UnaryAttributeClue uac2 && Attribute.IsExclusiveWith(uac2.Attribute);
 }

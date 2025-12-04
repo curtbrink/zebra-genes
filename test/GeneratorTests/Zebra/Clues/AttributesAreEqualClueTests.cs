@@ -1,5 +1,6 @@
 using Generator.Zebra.Clues.Abstract;
 using Generator.Zebra.Clues.Types;
+using Generator.Zebra.Types;
 
 namespace GeneratorTests.Zebra.Clues;
 
@@ -57,7 +58,7 @@ public class AttributesAreEqualClueTests
     public void AttributesAreEqualClue_IsNotEquivalentToCluesOfOtherTypes()
     {
         var sut = BuildClue(CatA, ValA, CatB, ValB);
-        var test = new AttributeIsBeforeClue(CatA, ValA, CatB, ValB);
+        var test = new AttributeIsBeforeClue(new ZebraAttribute(CatA, ValA), new ZebraAttribute(CatB, ValB));
 
         Assert.False(sut.IsEquivalentTo(test));
     }
@@ -91,12 +92,13 @@ public class AttributesAreEqualClueTests
     public void AttributesAreEqualClue_ContradictsOtherBinaryClueTypes_WithSameAttributes(int idx, bool hasSame,
         bool isContradiction)
     {
-        var otherAttr = hasSame ? (CatB, ValB) : (CatC, ValC);
+        var attrA = new ZebraAttribute(CatA, ValA);
+        var otherAttr = hasSame ? new ZebraAttribute(CatB, ValB) : new ZebraAttribute(CatC, ValC);
         BinaryAttributeClue? test = idx switch
         {
-            0 => new AttributeIsBeforeClue(CatA, ValA, otherAttr.Item1, otherAttr.Item2),
-            1 => new AttributeIsImmediatelyBeforeClue(CatA, ValA, otherAttr.Item1, otherAttr.Item2),
-            2 => new AttributesAreAdjacentClue(CatA, ValA, otherAttr.Item1, otherAttr.Item2),
+            0 => new AttributeIsBeforeClue(attrA, otherAttr),
+            1 => new AttributeIsImmediatelyBeforeClue(attrA, otherAttr),
+            2 => new AttributesAreAdjacentClue(attrA, otherAttr),
             _ => null
         };
         
@@ -108,9 +110,9 @@ public class AttributesAreEqualClueTests
         // invert!
         BinaryAttributeClue? test2 = idx switch
         {
-            0 => new AttributeIsBeforeClue(otherAttr.Item1, otherAttr.Item2, CatA, ValA),
-            1 => new AttributeIsImmediatelyBeforeClue(otherAttr.Item1, otherAttr.Item2, CatA, ValA),
-            2 => new AttributesAreAdjacentClue(otherAttr.Item1, otherAttr.Item2, CatA, ValA),
+            0 => new AttributeIsBeforeClue(otherAttr, attrA),
+            1 => new AttributeIsImmediatelyBeforeClue(otherAttr, attrA),
+            2 => new AttributesAreAdjacentClue(otherAttr, attrA),
             _ => null
         };
         
@@ -183,9 +185,10 @@ public class AttributesAreEqualClueTests
         var allDifferent = BuildClue("not", "a", "matching", "set");
         Assert.False(sut.Implies(allDifferent));
 
-        var differentClueType = new AttributeIsBeforeClue(CatA, ValA, CatB, ValB);
+        var differentClueType = new AttributeIsBeforeClue(new ZebraAttribute(CatA, ValA), new ZebraAttribute(CatB, ValB));
         Assert.False(sut.Implies(differentClueType));
     }
 
-    private static AttributesAreEqualClue BuildClue(string a, string a2, string b, string b2) => new(a, a2, b, b2);
+    private static AttributesAreEqualClue BuildClue(string a, string a2, string b, string b2) =>
+        new(new ZebraAttribute(a, a2), new ZebraAttribute(b, b2));
 }

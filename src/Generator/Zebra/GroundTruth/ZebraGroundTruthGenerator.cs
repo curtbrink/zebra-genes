@@ -3,6 +3,7 @@ using Csp.Interfaces;
 using Generator.Zebra.Clues;
 using Generator.Zebra.Clues.Abstract;
 using Generator.Zebra.Clues.Types;
+using Generator.Zebra.Types;
 
 namespace Generator.Zebra.GroundTruth;
 
@@ -33,7 +34,7 @@ public class ZebraGroundTruthGenerator
         return result;
     }
 
-    public static List<Clue> GenerateEntireCluePool(IDictionary<IVariable, int> fullSolution,
+    public static List<ZebraClue> GenerateEntireCluePool(IDictionary<IVariable, int> fullSolution,
         IDictionary<string, List<string>> categories)
     {
         // need a "clue interface/base object"
@@ -42,7 +43,7 @@ public class ZebraGroundTruthGenerator
         // - for each var b
         //   - add all true unique binary constraint clues between a and b (adjacent, before, immediate before, etc.)
 
-        List<Clue> allClues = [];
+        List<ZebraClue> allClues = [];
 
         var categoryKeys = categories.Keys.ToList();
         for (var i = 0; i < categoryKeys.Count; i++)
@@ -51,11 +52,12 @@ public class ZebraGroundTruthGenerator
             var aCatVals = categories[aCat];
             foreach (var aVar in aCatVals)
             {
+                var aAttr = new ZebraAttribute(aCat, aVar);
                 var aCspVar = fullSolution.Keys.First(k => k.Name == $"{aCat}:{aVar}");
                 var aVarPosition = fullSolution[aCspVar];
                 Console.WriteLine(
                     $"[outer] checking variable [{aCat}:{aVar}] -> position {aVarPosition}, adding position equals clue");
-                allClues.Add(new PositionEqualsClue(aCat, aVar, fullSolution[aCspVar]));
+                allClues.Add(new PositionEqualsClue(aAttr, fullSolution[aCspVar]));
 
                 // if we're iterating categories[i] values,
                 // we've already added all associations involving categories[i-1] values etc.
@@ -66,34 +68,32 @@ public class ZebraGroundTruthGenerator
                     // position equals clue for b will be handled by outer loop
                     foreach (var bVar in bCatVals)
                     {
+                        var bAttr = new ZebraAttribute(bCat, bVar);
                         var bCspVar = fullSolution.Keys.First(k => k.Name == $"{bCat}:{bVar}");
                         var bVarPosition = fullSolution[bCspVar];
                         Console.WriteLine($"[inner] checking variable [{bCat}:{bVar}] -> position {bVarPosition}");
                         if (aVarPosition == bVarPosition)
                         {
                             Console.WriteLine($"[inner] added attributes equal clue");
-                            allClues.Add(new AttributesAreEqualClue(aCat, aVar, bCat, bVar));
+                            allClues.Add(new AttributesAreEqualClue(aAttr, bAttr));
                         }
                         else
                         {
                             // which one is in the before position?
                             var aIsBefore = aVarPosition < bVarPosition;
-                            var (firstCat, firstVar, firstPos) =
-                                aIsBefore ? (aCat, aVar, aVarPosition) : (bCat, bVar, bVarPosition);
-                            var (secondCat, secondVar, secondPos) =
-                                aIsBefore ? (bCat, bVar, bVarPosition) : (aCat, aVar, aVarPosition);
+                            var (firstAttr, firstPos) = aIsBefore ? (aAttr, aVarPosition) : (bAttr, bVarPosition);
+                            var (secondAttr, secondPos) = aIsBefore ? (bAttr, bVarPosition) : (aAttr, aVarPosition);
                             
                             // one is always before if not equal
                             Console.WriteLine($"[inner] added attribute is before clue");
-                            allClues.Add(new AttributeIsBeforeClue(firstCat, firstVar, secondCat, secondVar));
+                            allClues.Add(new AttributeIsBeforeClue(firstAttr, secondAttr));
                             
                             // are they also adjacent?
                             if (firstPos == secondPos - 1)
                             {
                                 Console.WriteLine($"[inner] added attribute is adjacent and immediately before clues");
-                                allClues.Add(new AttributeIsImmediatelyBeforeClue(firstCat, firstVar, secondCat,
-                                    secondVar));
-                                allClues.Add(new AttributesAreAdjacentClue(firstCat, firstVar, secondCat, secondVar));
+                                allClues.Add(new AttributeIsImmediatelyBeforeClue(aAttr, bAttr));
+                                allClues.Add(new AttributesAreAdjacentClue(aAttr, bAttr));
                             }
                         }
                     }

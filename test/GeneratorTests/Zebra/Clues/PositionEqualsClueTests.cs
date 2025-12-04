@@ -1,4 +1,5 @@
 using Generator.Zebra.Clues.Types;
+using Generator.Zebra.Types;
 
 namespace GeneratorTests.Zebra.Clues;
 
@@ -63,7 +64,10 @@ public class PositionEqualsClueTests
     {
         var sut = BuildClue(CatA, ValA, PosA);
 
-        var test = new AttributeIsBeforeClue(CatA, ValA, CatB, ValB);
+        var attrA = new ZebraAttribute(CatA, ValA);
+        var attrB = new ZebraAttribute(ValB, ValB);
+
+        var test = new AttributeIsBeforeClue(attrA, attrB);
         Assert.False(sut.Contradicts(test));
     }
     
@@ -121,9 +125,10 @@ public class PositionEqualsClueTests
         var allDifferent = BuildClue(CatB, ValB, PosB);
         Assert.False(sut.Implies(allDifferent));
 
-        var differentClueType = new AttributeIsBeforeClue(CatA, ValA, CatB, ValB);
+        var differentClueType =
+            new AttributeIsBeforeClue(new ZebraAttribute(CatA, ValA), new ZebraAttribute(CatB, ValB));
         Assert.False(sut.Implies(differentClueType));
     }
 
-    private static PositionEqualsClue BuildClue(string a, string b, int c) => new (a, b, c);
+    private static PositionEqualsClue BuildClue(string a, string b, int c) => new(new ZebraAttribute(a, b), c);
 }
