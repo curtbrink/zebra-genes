@@ -19,13 +19,13 @@ public abstract class BaseSelfRefConstraint : IConstraint<string>
 
     public bool IsSatisfiable(IVariable? v, string? val, IDictionary<IOrderedVariable, IDomain<string>> domains)
     {
-        var newDomains = DeepCopy.ToOrderedDomains(domains);
+        var newDomains = DeepCopy.Domains(domains);
         return IsSatisfiableWithNewDomains(v, val, newDomains);
     }
     
     public bool IsSatisfiable(IVariable? v, string? val, IDictionary<IVariable, IDomain<string>> domains)
     {
-        var newDomains = DeepCopy.ToOrderedDomains(domains);
+        var newDomains = DeepCopy.DowncastDomains<string, IOrderedVariable>(domains);
         return IsSatisfiableWithNewDomains(v, val, newDomains);
     }
 
@@ -35,7 +35,7 @@ public abstract class BaseSelfRefConstraint : IConstraint<string>
         if (v is not null && val is not null)
         {
             if (v is not IOrderedVariable orderedV)
-                throw new ArgumentOutOfRangeException(nameof(v), "Owner variable must be ordered variable");
+                throw new ArgumentOutOfRangeException(nameof(v), "Partial assignment variable must be ordered variable");
             domains[orderedV] = new Domain<string>([val]);
         }
 
