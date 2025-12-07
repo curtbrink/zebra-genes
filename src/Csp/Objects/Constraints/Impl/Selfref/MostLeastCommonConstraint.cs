@@ -2,7 +2,7 @@ using Csp.Helpers;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Selfref;
+namespace Csp.Objects.Constraints.Impl.Selfref;
 
 public class MostLeastCommonConstraint(
     IOrderedVariable owner,

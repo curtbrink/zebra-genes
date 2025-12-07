@@ -1,5 +1,5 @@
-using Csp.Impl;
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Interfaces;
+using Csp.Objects.Csp;
 using Csp.Objects.Variables.Impl;
 using Csp.Objects.Variables.Interfaces;
 

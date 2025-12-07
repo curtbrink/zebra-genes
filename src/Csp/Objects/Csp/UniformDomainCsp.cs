@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl;
+namespace Csp.Objects.Csp;
 
 public class UniformDomainCsp<T> : ICsp<T>
 {

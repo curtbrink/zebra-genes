@@ -1,8 +1,8 @@
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Zebra;
+namespace Csp.Objects.Constraints.Impl.Zebra;
 
 public class AdjacentConstraint(IVariable v1, IVariable v2) : IConstraint<int>
 {

@@ -1,7 +1,7 @@
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Selfref;
+namespace Csp.Objects.Constraints.Impl.Selfref;
 
 // this type can cover all of these:
 // first X

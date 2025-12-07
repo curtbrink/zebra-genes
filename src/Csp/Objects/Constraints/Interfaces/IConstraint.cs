@@ -1,7 +1,7 @@
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Interfaces;
+namespace Csp.Objects.Constraints.Interfaces;
 
 public interface IConstraint<T>
 {

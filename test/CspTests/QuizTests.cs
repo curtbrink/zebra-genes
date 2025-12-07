@@ -1,8 +1,8 @@
 using Csp.Builders.Quiz;
 using Csp.Gac;
-using Csp.Impl;
-using Csp.Impl.Constraints.Selfref;
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Impl.Selfref;
+using Csp.Objects.Constraints.Interfaces;
+using Csp.Objects.Csp;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Impl;
 using Csp.Objects.Variables.Interfaces;

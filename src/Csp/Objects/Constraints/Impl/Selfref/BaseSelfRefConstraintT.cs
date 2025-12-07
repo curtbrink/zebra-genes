@@ -1,6 +1,6 @@
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Selfref;
+namespace Csp.Objects.Constraints.Impl.Selfref;
 
 // represents a generic logiquiz-type question constraint with ABCDE values mapped to something
 public abstract class BaseSelfRefConstraint<T> : BaseSelfRefConstraint

@@ -1,8 +1,8 @@
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Zebra;
+namespace Csp.Objects.Constraints.Impl.Zebra;
 
 public class OneOfConstraint(IVariable owner, List<int> allowedValues) : IConstraint<int>
 {

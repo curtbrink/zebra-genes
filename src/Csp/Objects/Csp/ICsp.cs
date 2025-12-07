@@ -1,7 +1,8 @@
+using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Interfaces;
+namespace Csp.Objects.Csp;
 
 public interface ICsp<T>
 {

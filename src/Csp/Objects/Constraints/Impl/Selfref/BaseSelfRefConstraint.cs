@@ -1,9 +1,9 @@
 using Csp.Helpers;
-using Csp.Interfaces;
+using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Interfaces;
 
-namespace Csp.Impl.Constraints.Selfref;
+namespace Csp.Objects.Constraints.Impl.Selfref;
 
 public abstract class BaseSelfRefConstraint : IConstraint<string>
 {
