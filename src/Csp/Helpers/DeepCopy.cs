@@ -1,5 +1,5 @@
-using Csp.Impl;
-using Csp.Interfaces;
+using Csp.Objects.Domain;
+using Csp.Objects.Variables.Interfaces;
 
 namespace Csp.Helpers;
 

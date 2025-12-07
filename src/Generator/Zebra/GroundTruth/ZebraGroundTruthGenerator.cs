@@ -1,13 +1,12 @@
 using Csp.Builders;
-using Csp.Interfaces;
+using Csp.Objects.Variables.Interfaces;
 using Generator.Zebra.Clues;
-using Generator.Zebra.Clues.Abstract;
 using Generator.Zebra.Clues.Types;
 using Generator.Zebra.Types;
 
 namespace Generator.Zebra.GroundTruth;
 
-public class ZebraGroundTruthGenerator
+public static class ZebraGroundTruthGenerator
 {
     // input: zebra builder
     // output: list of attribute variables (keys?) and positions representing a full solution

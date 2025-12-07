@@ -1,6 +1,9 @@
 using Csp.Impl;
 using Csp.Impl.Constraints.Zebra;
 using Csp.Interfaces;
+using Csp.Objects.Domain;
+using Csp.Objects.Variables.Impl;
+using Csp.Objects.Variables.Interfaces;
 
 namespace Csp.Builders;
 

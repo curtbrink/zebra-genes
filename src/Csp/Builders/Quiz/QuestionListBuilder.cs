@@ -1,4 +1,4 @@
-using Csp.Impl;
+using Csp.Objects.Domain;
 
 namespace Csp.Builders.Quiz;
 

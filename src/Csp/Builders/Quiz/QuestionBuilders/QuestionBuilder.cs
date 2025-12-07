@@ -1,4 +1,5 @@
 using Csp.Interfaces;
+using Csp.Objects.Variables.Interfaces;
 
 namespace Csp.Builders.Quiz;
 
