@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using Csp.Objects.Constraints.Impl.Sudoku;
-using Csp.Objects.Constraints.Impl.Zebra;
 using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Csp;
 using Csp.Objects.Domain;
