@@ -1,11 +1,14 @@
-﻿using Csp.Builders;
+﻿using System.Threading.Tasks.Dataflow;
+using Csp.Builders;
 using Csp.Gac;
+using Csp.Helpers;
 using Csp.Objects.Constraints.Impl.Zebra;
 using Csp.Objects.Constraints.Interfaces;
 using Csp.Objects.Csp;
 using Csp.Objects.Domain;
 using Csp.Objects.Variables.Impl;
 using Csp.Objects.Variables.Interfaces;
+using Csp.Types.Polyomino;
 
 namespace CspTests;
 
