@@ -13,7 +13,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
-    <Target Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
+    <Target Condition="'$(Configuration)' == 'Release'" Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
         <Exec Command="dotnet nuget push $(ProjectDir)bin/Release/$(PackageId).$(version).nupkg -s Local"></Exec>
     </Target>
 

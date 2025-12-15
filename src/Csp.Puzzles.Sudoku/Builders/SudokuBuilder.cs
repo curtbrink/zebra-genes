@@ -1,18 +1,20 @@
 using System.Collections.ObjectModel;
-using Csp.Objects.Constraints.Impl.Sudoku;
-using Csp.Objects.Constraints.Interfaces;
-using Csp.Objects.Csp;
-using Csp.Objects.Domain;
-using Csp.Objects.Variables.Impl;
-using Csp.Objects.Variables.Interfaces;
+using Csp.Core.Models.Models.Constraint.Interfaces;
+using Csp.Core.Models.Models.Csp;
+using Csp.Core.Models.Models.Csp.Interfaces;
+using Csp.Core.Models.Models.Domain;
+using Csp.Core.Models.Models.Domain.Interfaces;
+using Csp.Core.Models.Models.Variable;
+using Csp.Core.Models.Models.Variable.Interfaces;
+using Csp.Puzzles.Sudoku.Constraints;
 
-namespace Csp.Builders;
+namespace Csp.Puzzles.Sudoku.Builders;
 
 public class SudokuBuilder
 {
     private readonly List<IGridCellVariable> _variables = [];
     private readonly List<IConstraint<int>> _constraints = [];
-    private readonly Domain<int> _domain = new ([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    private readonly ImmutableDomain<int> _domain = new (1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     private readonly Dictionary<IGridCellVariable, int> _setCells = new();
     
@@ -92,22 +94,22 @@ public class SudokuBuilder
         return this;
     }
 
-    public Csp<int> Build()
+    public ICsp<int> Build()
     {
         // turn our set cells into real domains
         var dict = new Dictionary<IVariable, IDomain<int>>();
         foreach (var v in _variables)
         {
-            if (!_setCells.ContainsKey(v))
+            if (_setCells.TryGetValue(v, out var cell))
             {
-                dict[v] = new Domain<int>(_domain.Values);
+                dict[v] = new ImmutableDomain<int>(cell);
             }
             else
             {
-                dict[v] = new Domain<int>([_setCells[v]]);
+                dict[v] = new ImmutableDomain<int>(_domain.Values);
             }
         }
 
-        return new Csp<int>(_variables, new ReadOnlyDictionary<IVariable, IDomain<int>>(dict), _constraints);
+        return new BaseCsp<int>(_variables, new ReadOnlyDictionary<IVariable, IDomain<int>>(dict), _constraints);
     }
 }
