@@ -1,7 +1,3 @@
-using Csp.Core.Models.Models.Domain;
-using Csp.Core.Models.Models.Domain.Interfaces;
-using Csp.Core.Models.Models.Variable;
-using Csp.Core.Models.Models.Variable.Interfaces;
 using Csp.Puzzles.Zebra.Constraints;
 
 namespace Csp.Puzzles.Zebra.Tests.Constraints;

@@ -27,7 +27,7 @@ public static class DeepCopy
         var newDict = new Dictionary<TVar, IDomain<T>>();
         foreach (var v in domains.Keys)
         {
-            newDict[v] = new Domain<T>(domains[v].Values.ToList());
+            newDict[v] = new ImmutableDomain<T>(domains[v].Values.ToList());
         }
 
         return newDict;
@@ -41,7 +41,7 @@ public static class DeepCopy
             if (v is not TVar orderedV)
                 throw new ArgumentOutOfRangeException(nameof(domains), $"All variables must be of type {typeof(TVar).Name}");
             
-            newDict[orderedV] = new Domain<T>(domain.Values.ToList());
+            newDict[orderedV] = new ImmutableDomain<T>(domain.Values.ToList());
         }
 
         return newDict;

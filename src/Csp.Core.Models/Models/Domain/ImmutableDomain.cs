@@ -2,19 +2,19 @@ using Csp.Core.Models.Models.Domain.Interfaces;
 
 namespace Csp.Core.Models.Models.Domain;
 
-public class Domain<T> : IDomain<T>
+public class ImmutableDomain<T> : IDomain<T>
 {
-    public Domain(IEnumerable<T> values)
+    public ImmutableDomain(IEnumerable<T> values)
     {
         Values = new HashSet<T>(values);
     }
     
-    public Domain(params T[] values)
+    public ImmutableDomain(params T[] values)
     {
         Values = new HashSet<T>(values);
     }
 
-    public Domain(IDomain<T> existing)
+    public ImmutableDomain(IDomain<T> existing)
     {
         Values = new HashSet<T>(existing.Values);
     }

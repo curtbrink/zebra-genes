@@ -1,53 +1,11 @@
-﻿using System.Threading.Tasks.Dataflow;
-using Csp.Builders;
-using Csp.Gac;
-using Csp.Helpers;
-using Csp.Objects.Constraints.Impl.Zebra;
-using Csp.Objects.Constraints.Interfaces;
-using Csp.Objects.Csp;
-using Csp.Objects.Domain;
-using Csp.Objects.Variables.Impl;
-using Csp.Objects.Variables.Interfaces;
-using Csp.Types.Polyomino;
+using Csp.Puzzles.Zebra.Builders;
 
-namespace CspTests;
+namespace Csp.Puzzles.Zebra.Tests.Builders;
 
-public class ZebraTests
+public class ZebraBuilderTests
 {
     [Fact]
-    public void TestZebraCsp()
-    {
-        var domain = new Domain<int>([1, 2]);
-
-        var categories = new Dictionary<string, List<IVariable>>();
-        categories["Name"] = [new BaseVariable("Jed"), new BaseVariable("Eddy")];
-        categories["Pet"] = [new BaseVariable("Dinosaur"), new BaseVariable("Flea")];
-
-        List<IConstraint<int>> constraints =
-        [
-            new AllDifferentConstraint(categories["Name"], "Name"),
-            new AllDifferentConstraint(categories["Pet"], "Pet"),
-            new EqualsConstraint(categories["Name"][0], categories["Pet"][0]), // Jed pos == dinosaur pos
-            new OneOfConstraint(categories["Pet"][1], [2]) // Flea is in position 2
-        ];
-        
-        // immutable csp
-        var csp = new UniformDomainCsp<int>([.. categories["Name"], .. categories["Pet"]], domain, constraints);
-        
-        // working objects
-        var runConstraints = csp.Constraints.ToList();
-        var runDomains = new Dictionary<IVariable, IDomain<int>>(csp.Domains);
-        var solvedDomains = Gac.Run(runConstraints, runDomains);
-
-        foreach (var k in solvedDomains.Keys)
-        {
-            var kDomain = solvedDomains[k].Values;
-            Assert.Single(kDomain);
-        }
-    }
-
-    [Fact]
-    public void TestBuilder()
+    public void TestZebraBuilder1()
     {
         var (zebra, _) = ZebraBuilder.Create(3)
             .AddCategory("Name", ["Riktus", "Psyja", "Arkturus"])
@@ -59,16 +17,12 @@ public class ZebraTests
             .AddConstraint("Riktus").MustBeInPosition([1, 3])
             .Build();
 
-        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zebra.Domains);
-        List<IConstraint<int>> workingConstraints = [..zebra.Constraints];
-
-        var solvedDomains = Gac.Run(workingConstraints, workingDomains);
-
-        Assert.True(true);
+        Assert.Equal(6, zebra.Variables.Count);
+        Assert.Equal(7, zebra.Constraints.Count);
     }
     
     [Fact]
-    public void TestZebraBuilder1()
+    public void TestZebraBuilder2()
     {
         var (zb, _) = ZebraBuilder.Create(4)
             .AddCategory("Shirt", ["black", "green", "orange", "purple"])
@@ -88,16 +42,12 @@ public class ZebraTests
             .AddConstraint("lily").MustBeInPosition(3)
             .Build();
         
-        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zb.Domains);
-        var workingConstraints = zb.Constraints.ToList();
-        
-        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
-
-        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+        Assert.Equal(16, zb.Variables.Count);
+        Assert.Equal(15, zb.Constraints.Count);
     }
     
     [Fact]
-    public void TestZebraBuilder5()
+    public void TestZebraBuilder3()
     {
         var (zb, _) = ZebraBuilder.Create(5)
             .AddCategory("Shirt", ["black", "pink", "red", "white", "yellow"])
@@ -131,16 +81,12 @@ public class ZebraTests
             .AddConstraint("Toshina").Is("10min")
             .Build();
         
-        var workingDomains = new Dictionary<IVariable, IDomain<int>>(zb.Domains);
-        var workingConstraints = zb.Constraints.ToList();
-        
-        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
-
-        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+        Assert.Equal(30, zb.Variables.Count);
+        Assert.Equal(29, zb.Constraints.Count);
     }
 
     [Fact]
-    public void TestZebraBuilder6()
+    public void TestZebraBuilder4()
     {
         var (z, _) = ZebraBuilder.Create(4)
             .AddCategory("Shirt", ["green", "orange", "purple", "white"])
@@ -160,11 +106,7 @@ public class ZebraTests
             .AddConstraint("Walter").Is("hexagon")
             .Build();
         
-        var workingDomains = new Dictionary<IVariable, IDomain<int>>(z.Domains);
-        var workingConstraints = z.Constraints.ToList();
-        
-        var domainsToBacktrack = Gac.Run(workingConstraints, workingDomains);
-
-        var solvedDomains = Gac.RunWithBacktrackingSearch(workingConstraints, domainsToBacktrack);
+        Assert.Equal(16, z.Variables.Count);
+        Assert.Equal(15, z.Constraints.Count);
     }
 }
