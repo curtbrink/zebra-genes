@@ -1,81 +1,26 @@
-using Csp.Core.Models.Models.Domain;
-using Csp.Core.Models.Models.Domain.Interfaces;
-using Csp.Core.Models.Models.Variable;
-using Csp.Core.Models.Models.Variable.Interfaces;
 using Csp.Puzzles.Zebra.Constraints;
 
 namespace Csp.Puzzles.Zebra.Tests.Constraints;
 
-public class AdjacentConstraintTests
+public class AdjacentConstraintTests : BaseZebraTests
 {
-    private readonly Variable _varA = new ("A");
-    private readonly Variable _varB = new ("B");
-
-    private readonly List<int> _initialZebraDomain = [1, 2, 3, 4, 5];
-
-    [Fact]
-    public void AdjacentConstraint_IsSatisfiable_WithDefaultZebraDomains()
+    [Theory]
+    [InlineData(null, null, true)]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 1, 2, 3 }, true)]
+    [InlineData(new[] { 3 }, new[] { 1, 2, 3 }, true)]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 1 }, true)]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 4, 5 }, true)]
+    [InlineData(new[] { 2, 3 }, new[] { 1, 2 }, true)]
+    [InlineData(new[] { 2, 3 }, new[] { 1, 5 }, true)]
+    [InlineData(new[] { 2 }, new[] { 4, 5 }, false)]
+    public void AdjacentConstraint_IsSatisfiable_WithValidDomains(int[]? dA, int[]? dB, bool isValid)
     {
-        var dict = new Dictionary<IVariable, IDomain<int>>
-        {
-            [_varA] = new Domain<int>(_initialZebraDomain),
-            [_varB] = new Domain<int>(_initialZebraDomain)
-        };
+        var domainStore = GetDomainStore(dA, dB);
 
-        var domainStore = new DomainStore<int>(dict);
-        
         var sut = CreateAdjacentConstraint();
-
-        Assert.True(sut.IsSatisfiable(domainStore));
-    }
-    
-    [Fact]
-    public void AdjacentConstraint_IsSatisfiable_WithForcedAdjacentDomains()
-    {
-        var dict = new Dictionary<IVariable, IDomain<int>>
-        {
-            [_varA] = new Domain<int>(4),
-            [_varB] = new Domain<int>(5),
-        };
-
-        var domainStore = new DomainStore<int>(dict);
         
-        var sut = CreateAdjacentConstraint();
-
-        Assert.True(sut.IsSatisfiable(domainStore));
-    }
-    
-    [Fact]
-    public void AdjacentConstraint_IsSatisfiable_WithSomeDisjointButValidDomains()
-    {
-        var dict = new Dictionary<IVariable, IDomain<int>>
-        {
-            [_varA] = new Domain<int>(1, 3),
-            [_varB] = new Domain<int>(4, 5),
-        };
-
-        var domainStore = new DomainStore<int>(dict);
-        
-        var sut = CreateAdjacentConstraint();
-
-        Assert.True(sut.IsSatisfiable(domainStore));
-    }
-    
-    [Fact]
-    public void AdjacentConstraint_IsNotSatisfiable_WithNonAdjacentDomains()
-    {
-        var dict = new Dictionary<IVariable, IDomain<int>>
-        {
-            [_varA] = new Domain<int>(1, 2),
-            [_varB] = new Domain<int>(4, 5),
-        };
-
-        var domainStore = new DomainStore<int>(dict);
-        
-        var sut = CreateAdjacentConstraint();
-
-        Assert.False(sut.IsSatisfiable(domainStore));
+        Assert.Equal(isValid, sut.IsSatisfiable(domainStore));
     }
 
-    private AdjacentConstraint CreateAdjacentConstraint() => new(_varA, _varB);
+    private AdjacentConstraint CreateAdjacentConstraint() => new(VarA, VarB);
 }

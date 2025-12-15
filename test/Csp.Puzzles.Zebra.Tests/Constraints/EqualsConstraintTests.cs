@@ -2,25 +2,25 @@ using Csp.Puzzles.Zebra.Constraints;
 
 namespace Csp.Puzzles.Zebra.Tests.Constraints;
 
-public class AllDifferentConstraintTests : BaseZebraTests
+public class EqualsConstraintTests : BaseZebraTests
 {
     [Theory]
     [InlineData(null , null, true)]
     [InlineData(new [] {1, 2, 3}, new [] {1, 2, 3}, true)]
     [InlineData(new [] {3}, new [] {1, 2, 3}, true)]
     [InlineData(new [] {1, 2, 3}, new [] {1}, true)]
-    [InlineData(new [] {1, 2, 3}, new [] {4, 5}, true)]
+    [InlineData(new [] {1, 2, 3}, new [] {4, 5}, false)]
     [InlineData(new [] {2, 3}, new [] {1, 2}, true)]
-    [InlineData(new [] {2, 3}, new [] {1, 5}, true)]
-    [InlineData(new [] {2}, new [] {2}, false)]
-    public void AllDifferentConstraint_IsSatisfiable_WithValidDomains(int[]? dA, int[]? dB, bool isValid)
+    [InlineData(new [] {2, 3}, new [] {1, 5}, false)]
+    [InlineData(new [] {2}, new [] {2}, true)]
+    public void EqualsConstraint_IsSatisfiable_WithValidDomains(int[]? dA, int[]? dB, bool isValid)
     {
         var domainStore = GetDomainStore(dA, dB);
         
-        var sut = CreateAllDifferentConstraint();
+        var sut = CreateEqualsConstraint();
 
         Assert.Equal(isValid, sut.IsSatisfiable(domainStore));
     }
 
-    private AllDifferentConstraint CreateAllDifferentConstraint() => new([VarA, VarB], "testcategory");
+    private EqualsConstraint CreateEqualsConstraint() => new(VarA, VarB);
 }
