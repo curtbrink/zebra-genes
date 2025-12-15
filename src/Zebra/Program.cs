@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Csp.Builders;
-using Generator.Zebra.GroundTruth;
+using Generator.Zebra.Zebra.GroundTruth;
 
 // test solution and clue generator
 var zebra = ZebraBuilder.Create(5)

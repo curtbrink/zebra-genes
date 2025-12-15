@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Csp\Csp.csproj" />
+      <PackageReference Include="ZebraGenes.Csp.Puzzles.Zebra" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Generator.Zebra.Types;
+namespace Generator.Zebra.Zebra.Types;
 
 public record ZebraAttribute(string Category, string Attribute)
 {

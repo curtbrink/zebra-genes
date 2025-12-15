@@ -8,9 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C7A14326-A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CspTests", "test\CspTests\CspTests.csproj", "{FEABC34C-A489-42CE-9D28-36A9248BCDBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "src\Generator\Generator.csproj", "{7CFCDDE8-352C-4496-99F5-E06D92C7F514}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Zebra", "src\Generator.Zebra\Generator.Zebra.csproj", "{7CFCDDE8-352C-4496-99F5-E06D92C7F514}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratorTests", "test\GeneratorTests\GeneratorTests.csproj", "{13F9388B-A2EA-4D7E-960F-9F67E12653D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Zebra.Tests", "test\Generator.Zebra.Tests\Generator.Zebra.Tests.csproj", "{13F9388B-A2EA-4D7E-960F-9F67E12653D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp.Core.Models", "src\Csp.Core.Models\Csp.Core.Models.csproj", "{F6180432-390F-40CB-A41A-9BDADDBB7414}"
 EndProject
@@ -25,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp.Puzzles.Zebra", "src\Csp.Puzzles.Zebra\Csp.Puzzles.Zebra.csproj", "{AE9230A6-2F17-46E7-A7DF-0E712DAF8881}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp.Puzzles.Zebra.Tests", "test\Csp.Puzzles.Zebra.Tests\Csp.Puzzles.Zebra.Tests.csproj", "{A5A20B67-29AB-4BC8-9F43-BAF05985AF17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generator", "Generator", "{31303AE4-BD39-4D50-A1D3-1B21E6AAC06B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,5 +80,6 @@ Global
 		{97DE0092-6010-4E09-9430-8B966FBBF7B4} = {41DB119A-AD0A-4E49-B613-12F70EF42029}
 		{AE9230A6-2F17-46E7-A7DF-0E712DAF8881} = {97DE0092-6010-4E09-9430-8B966FBBF7B4}
 		{A5A20B67-29AB-4BC8-9F43-BAF05985AF17} = {C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}
+		{7CFCDDE8-352C-4496-99F5-E06D92C7F514} = {31303AE4-BD39-4D50-A1D3-1B21E6AAC06B}
 	EndGlobalSection
 EndGlobal

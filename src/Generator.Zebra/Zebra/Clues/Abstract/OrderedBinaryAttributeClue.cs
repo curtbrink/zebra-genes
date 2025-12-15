@@ -1,7 +1,7 @@
-using Generator.Zebra.Clues.Types;
-using Generator.Zebra.Types;
+using Generator.Zebra.Zebra.Clues.Types;
+using Generator.Zebra.Zebra.Types;
 
-namespace Generator.Zebra.Clues.Abstract;
+namespace Generator.Zebra.Zebra.Clues.Abstract;
 
 public abstract record OrderedBinaryAttributeClue(ZebraAttribute Attribute1, ZebraAttribute Attribute2)
     : BinaryAttributeClue(Attribute1, Attribute2);

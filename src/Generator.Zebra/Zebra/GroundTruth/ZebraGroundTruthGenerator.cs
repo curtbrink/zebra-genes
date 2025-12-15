@@ -1,10 +1,10 @@
-using Csp.Builders;
-using Csp.Objects.Variables.Interfaces;
-using Generator.Zebra.Clues;
-using Generator.Zebra.Clues.Types;
-using Generator.Zebra.Types;
+using Csp.Core.Models.Models.Variable.Interfaces;
+using Csp.Puzzles.Zebra.Builders;
+using Generator.Zebra.Zebra.Clues;
+using Generator.Zebra.Zebra.Clues.Types;
+using Generator.Zebra.Zebra.Types;
 
-namespace Generator.Zebra.GroundTruth;
+namespace Generator.Zebra.Zebra.GroundTruth;
 
 public static class ZebraGroundTruthGenerator
 {

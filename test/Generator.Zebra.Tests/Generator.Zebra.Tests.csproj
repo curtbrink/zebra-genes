@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Generator\Generator.csproj" />
+      <ProjectReference Include="..\..\src\Generator.Zebra\Generator.Zebra.csproj" />
     </ItemGroup>
 
 </Project>

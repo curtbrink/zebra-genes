@@ -1,8 +1,8 @@
-using Generator.Zebra.Clues.Abstract;
-using Generator.Zebra.Clues.Types;
-using Generator.Zebra.Types;
+using Generator.Zebra.Zebra.Clues.Abstract;
+using Generator.Zebra.Zebra.Clues.Types;
+using Generator.Zebra.Zebra.Types;
 
-namespace GeneratorTests.Zebra.Clues;
+namespace Generator.Zebra.Tests.Clues;
 
 public class AttributesAreEqualClueTests
 {

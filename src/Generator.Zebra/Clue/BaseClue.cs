@@ -1,4 +1,4 @@
-namespace Generator.Clue;
+namespace Generator.Zebra.Clue;
 
 public abstract record BaseClue<TSelf> where TSelf : BaseClue<TSelf>
 {

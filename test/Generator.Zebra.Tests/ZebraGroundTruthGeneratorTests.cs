@@ -1,8 +1,8 @@
-﻿using Csp.Builders;
-using Generator.Zebra.GroundTruth;
+﻿using Csp.Puzzles.Zebra.Builders;
+using Generator.Zebra.Zebra.GroundTruth;
 using Xunit.Abstractions;
 
-namespace GeneratorTests;
+namespace Generator.Zebra.Tests;
 
 public class ZebraGroundTruthGeneratorTests(ITestOutputHelper testOutputHelper)
 {

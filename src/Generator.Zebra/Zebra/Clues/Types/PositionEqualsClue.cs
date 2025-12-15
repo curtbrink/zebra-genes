@@ -1,7 +1,7 @@
-using Generator.Zebra.Clues.Abstract;
-using Generator.Zebra.Types;
+using Generator.Zebra.Zebra.Clues.Abstract;
+using Generator.Zebra.Zebra.Types;
 
-namespace Generator.Zebra.Clues.Types;
+namespace Generator.Zebra.Zebra.Clues.Types;
 
 public record PositionEqualsClue(ZebraAttribute Attribute, int Position) : UnaryAttributeClue(Attribute)
 {
