@@ -1,22 +1,23 @@
-using Csp.Objects.Constraints.Impl.Akari;
-using Csp.Objects.Constraints.Impl.Akari.Objects;
-using Csp.Objects.Constraints.Interfaces;
-using Csp.Objects.Csp;
-using Csp.Objects.Domain;
-using Csp.Objects.Variables.Impl;
-using Csp.Objects.Variables.Interfaces;
+using Csp.Core.Models.Models.Constraint.Interfaces;
+using Csp.Core.Models.Models.Csp;
+using Csp.Core.Models.Models.Csp.Interfaces;
+using Csp.Core.Models.Models.Domain;
+using Csp.Core.Models.Models.Variable;
+using Csp.Core.Models.Models.Variable.Interfaces;
+using Csp.Puzzles.Akari.Constraints;
+using Csp.Puzzles.Akari.Models;
 
-namespace Csp.Builders;
+namespace Csp.Puzzles.Akari.Builders;
 
 public class AkariBuilder
 {
     private readonly List<IGridCellVariable> _variables = [];
     private readonly List<IConstraint<int>> _constraints = [];
-    private readonly Domain<int> _domain = new ([0, 1]);
+    private readonly ImmutableDomain<int> _domain = new (0, 1);
 
-    private int _width = 0;
-    private int _height = 0;
-    private char[,] _grid;
+    private int _width = 1;
+    private int _height = 1;
+    private char[,] _grid = new char[1, 1];
     
     private AkariBuilder()
     {
@@ -47,7 +48,7 @@ public class AkariBuilder
         return this;
     }
 
-    public UniformDomainCsp<int> Build()
+    public ICsp<int> Build()
     {
         // turn our cells into constraints.
         // 1. create variable for every empty cell
@@ -165,7 +166,7 @@ public class AkariBuilder
             }
         }
 
-        return new UniformDomainCsp<int>(_variables, _domain, _constraints);
+        return new BaseCsp<int>(_variables, _domain, _constraints);
     }
 
     private List<IGridCellVariable> GetNeighbors(int x, int y)

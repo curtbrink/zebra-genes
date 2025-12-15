@@ -1,6 +1,6 @@
-using Csp.Objects.Variables.Interfaces;
+using Csp.Core.Models.Models.Variable.Interfaces;
 
-namespace Csp.Objects.Constraints.Impl.Akari.Objects;
+namespace Csp.Puzzles.Akari.Models;
 
 public abstract class Segment
 {
