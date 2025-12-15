@@ -4,6 +4,13 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>ZebraGenes.Csp.Core.Solvers</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes component that contains generic CSP models and a GAC/Backtracking solver implementation.
+        </Description>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,5 +20,9 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.1" />
     </ItemGroup>
+
+    <Target Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
+        <Exec Command="dotnet nuget push $(ProjectDir)bin/Release/$(PackageId).$(version).nupkg -s Local"></Exec>
+    </Target>
 
 </Project>
