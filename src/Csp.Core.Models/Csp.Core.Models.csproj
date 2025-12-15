@@ -4,6 +4,17 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>ZebraGenes.Csp.Core.Models</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes component that contains generic CSP models.
+        </Description>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
+
+    <Target Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
+        <Exec Command="dotnet nuget push $(ProjectDir)bin/Release/$(PackageId).$(version).nupkg -s Local"></Exec>
+    </Target>
 
 </Project>
