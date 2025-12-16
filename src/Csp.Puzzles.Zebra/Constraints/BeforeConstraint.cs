@@ -8,7 +8,7 @@ public class BeforeConstraint(IVariable v1, IVariable v2) : IConstraint<int>
 {
     public string Name => "Before";
     public string Description => $"{v1.Name} is before {v2.Name}";
-    
+
     public IReadOnlyList<IVariable> Scope { get; } = [v1, v2];
 
     public bool IsSatisfiable(IDomainStore<int> domains) => domains.GetDomain(v1).Values

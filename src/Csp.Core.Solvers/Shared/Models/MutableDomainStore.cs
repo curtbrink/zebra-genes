@@ -28,10 +28,13 @@ public class MutableDomainStore<T> : IMutableDomainStore<T>
     }
     
     public IDomain<T> GetDomain(IVariable variable) => _domains[variable];
-    
+
     public IMutableDomain<T> GetMutableDomain(IVariable variable) => _domains[variable];
     
     public void SetMutableDomain(IVariable variable, IMutableDomain<T> domain) => _domains[variable] = domain;
 
     public IDictionary<IVariable, IMutableDomain<T>> GetAllDomains() => _domains;
+
+    IDictionary<IVariable, IDomain<T>> IDomainStore<T>.GetAllDomains() =>
+        _domains.ToDictionary(kvp => kvp.Key, IDomain<T> (kvp) => kvp.Value);
 }

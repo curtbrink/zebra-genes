@@ -30,18 +30,22 @@ public record AttributesAreEqualClue(ZebraAttribute Attribute1, ZebraAttribute A
         {
             return Attribute2.IsExclusiveWith(aec.Attribute2);
         }
+
         if (Attribute1 == aec.Attribute2)
         {
             return Attribute2.IsExclusiveWith(aec.Attribute1);
         }
+
         if (Attribute2 == aec.Attribute1)
         {
             return Attribute1.IsExclusiveWith(aec.Attribute2);
         }
+
         if (Attribute2 == aec.Attribute2)
         {
             return Attribute1.IsExclusiveWith(aec.Attribute1);
         }
+
         // else there isn't a matching attribute
         return false;
     }

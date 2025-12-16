@@ -11,7 +11,7 @@ public abstract record OrderedBinaryAttributeClue<TSelf>(ZebraAttribute Attribut
     where TSelf : OrderedBinaryAttributeClue<TSelf>
 {
     public override bool IsEquivalentTo(ZebraClue? other) => this == other; // must match type and order exactly
-    
+
     // order matters for the before clues
     public override bool Contradicts(ZebraClue? other)
     {

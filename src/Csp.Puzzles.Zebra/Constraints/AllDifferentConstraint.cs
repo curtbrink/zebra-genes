@@ -10,7 +10,7 @@ public class AllDifferentConstraint(IReadOnlyList<IVariable> scope, string categ
     public string Description => $"Uniqueness for {category}";
 
     public IReadOnlyList<IVariable> Scope { get; } = scope;
-    
+
     public bool IsSatisfiable(IDomainStore<int> domains)
     {
         var allDomainsWithForcedDomains = Scope.Select(domains.GetDomain).Where(sd => sd.Values.Count == 1).ToList();

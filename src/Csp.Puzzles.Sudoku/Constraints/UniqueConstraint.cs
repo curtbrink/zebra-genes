@@ -9,7 +9,7 @@ public class UniqueConstraint(IReadOnlyList<IGridCellVariable> scope, string nam
     public string Name => name;
     public string Description => $"{name} uniqueness";
     public IReadOnlyList<IVariable> Scope => scope;
-    
+
     public bool IsSatisfiable(IDomainStore<int> domains)
     {
         // can't work if any domain is empty

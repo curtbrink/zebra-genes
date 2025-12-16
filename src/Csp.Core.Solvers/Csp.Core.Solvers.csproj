@@ -1,26 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <PackageId>ZebraGenes.Csp.Core.Solvers</PackageId>
-        <Version>1.0.0</Version>
         <Authors>curtbrink</Authors>
         <Description>
             ZebraGenes component that contains a GAC/Backtracking solver implementation.
         </Description>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ZebraGenes.Csp.Core.Models" Version="1.0.0"/>
-
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.1"/>
     </ItemGroup>
 
-    <Target Condition="'$(Configuration)' == 'Release'" Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
-        <Exec Command="dotnet nuget push $(ProjectDir)bin/Release/$(PackageId).$(version).nupkg -s Local"></Exec>
-    </Target>
+    <ItemGroup>
+        <ProjectReference Include="..\Csp.Core.Models\Csp.Core.Models.csproj"/>
+    </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ public record AttributeIsImmediatelyBeforeClue(ZebraAttribute Attribute1, ZebraA
     {
         // the same set of contradictions as "before" clues applies 
         if (base.Contradicts(other)) return true;
-        
+
         // also contradicts this case:
         // if I'm saying "A:x is immediately before B:y"
         // then "A:x is immediately before B:z" has to be false,
@@ -34,7 +34,7 @@ public record AttributeIsImmediatelyBeforeClue(ZebraAttribute Attribute1, ZebraA
     public override bool Implies(ZebraClue? other)
     {
         if (base.Implies(other)) return true;
-        
+
         if (other is not BinaryAttributeClue bac) return false;
 
         return bac switch

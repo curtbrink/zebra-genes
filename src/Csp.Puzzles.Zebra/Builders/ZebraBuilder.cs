@@ -16,14 +16,14 @@ public partial class ZebraBuilder
     private readonly List<IVariable> _variables = [];
     private readonly List<IConstraint<int>> _constraints = [];
     private readonly ImmutableDomain<int> _domain;
-    
+
     private ZebraBuilder(int size)
     {
         _size = size;
         _domain = BuildDomain(size);
     }
 
-    public static ZebraBuilder Create(int size) => new (size);
+    public static ZebraBuilder Create(int size) => new(size);
 
     public ZebraBuilder AddCategory(string name, List<string> values)
     {
@@ -32,14 +32,14 @@ public partial class ZebraBuilder
             throw new ArgumentOutOfRangeException(nameof(values),
                 $"Value list size {values.Count} must equal puzzle size {_size}");
         }
-        
+
         // add to our "reference guide"
         _categories.Add(name, values);
 
         // make CSP variables
         var newVariables = values.Select(v => new BaseVariable(BuildKey(name, v))).ToList();
         _variables.AddRange(newVariables);
-        
+
         // all values in category must be in a different position
         _constraints.Add(new AllDifferentConstraint(newVariables, name));
 

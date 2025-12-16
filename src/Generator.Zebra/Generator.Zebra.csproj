@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <PackageId>ZebraGenes.Generator.Zebra</PackageId>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes Generator for Zebra puzzles.
+        </Description>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ZebraGenes.Csp.Puzzles.Zebra" Version="1.0.0" />
+        <ProjectReference Include="..\Csp.Puzzles.Zebra\Csp.Puzzles.Zebra.csproj" />
     </ItemGroup>
 
 </Project>

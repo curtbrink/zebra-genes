@@ -16,7 +16,7 @@ public static class ZebraGroundTruthGenerator
 
         var k = csp.Domains.Keys.ToList()[0];
         var domain = csp.Domains[k].Values.ToList();
-        
+
         var result = new Dictionary<IVariable, int>();
 
         foreach (var c in categories.Keys)
@@ -82,11 +82,11 @@ public static class ZebraGroundTruthGenerator
                             var aIsBefore = aVarPosition < bVarPosition;
                             var (firstAttr, firstPos) = aIsBefore ? (aAttr, aVarPosition) : (bAttr, bVarPosition);
                             var (secondAttr, secondPos) = aIsBefore ? (bAttr, bVarPosition) : (aAttr, aVarPosition);
-                            
+
                             // one is always before if not equal
                             Console.WriteLine($"[inner] added attribute is before clue");
                             allClues.Add(new AttributeIsBeforeClue(firstAttr, secondAttr));
-                            
+
                             // are they also adjacent?
                             if (firstPos == secondPos - 1)
                             {

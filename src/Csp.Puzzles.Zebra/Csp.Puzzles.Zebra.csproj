@@ -1,25 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <PackageId>ZebraGenes.Csp.Puzzles.Zebra</PackageId>
-        <Version>1.0.0</Version>
         <Authors>curtbrink</Authors>
         <Description>
             ZebraGenes component that contains Zebra-puzzle-specific CSP constraints, as well as a builder class for
             creating Zebra puzzle CSP encodings via a fluent-style builder API.
         </Description>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ZebraGenes.Csp.Core.Models" Version="1.0.0"/>
+        <ProjectReference Include="..\Csp.Core.Models\Csp.Core.Models.csproj" />
     </ItemGroup>
-
-    <Target Condition="'$(Configuration)' == 'Release'" Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
-        <Exec Command="dotnet nuget push $(ProjectDir)bin/Release/$(PackageId).$(version).nupkg -s Local"></Exec>
-    </Target>
 
 </Project>

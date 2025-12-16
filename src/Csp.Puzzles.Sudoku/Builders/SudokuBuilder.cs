@@ -14,10 +14,10 @@ public class SudokuBuilder
 {
     private readonly List<IGridCellVariable> _variables = [];
     private readonly List<IConstraint<int>> _constraints = [];
-    private readonly ImmutableDomain<int> _domain = new (1, 2, 3, 4, 5, 6, 7, 8, 9);
+    private readonly ImmutableDomain<int> _domain = new(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     private readonly Dictionary<IGridCellVariable, int> _setCells = new();
-    
+
     private SudokuBuilder()
     {
         for (var i = 0; i < 9; i++)
@@ -27,7 +27,7 @@ public class SudokuBuilder
                 _variables.Add(new GridCellVariable(j, i));
             }
         }
-        
+
         // rows
         for (var i = 0; i < 9; i++)
         {
@@ -42,7 +42,6 @@ public class SudokuBuilder
                     v.Y >= yStart && v.Y <= yStart + 2 && v.X >= xStart && v.X <= xStart + 2).ToList(),
                 $"Square {i + 1}"));
         }
-        
     }
 
     public static SudokuBuilder Create() => new();
@@ -76,14 +75,14 @@ public class SudokuBuilder
         {
             throw new ArgumentOutOfRangeException(nameof(v), "Value must be 1-9 inclusive");
         }
-        
+
         // add to our "reference guide"
         var variable = _variables.Find(gridVar => gridVar.X == x - 1 && gridVar.Y == y - 1);
         if (variable == null)
         {
             throw new ArgumentOutOfRangeException(nameof(x), "x and y values must be 1-9 inclusive");
         }
-        
+
         // we simply set that variable's domain at build time
         var success = _setCells.TryAdd(variable, v);
         if (!success)

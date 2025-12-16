@@ -57,9 +57,9 @@ public partial class ZebraBuilder
         public ZebraBuilder IsImmediatelyBefore(string other) => IsNBefore(other, 1);
 
         public ZebraBuilder IsImmediatelyAfter(string other) => IsNAfter(other, 1);
-        
+
         public ZebraBuilder IsNBefore(string other, int pos) => IsNBefore(other, pos, false);
-        
+
         public ZebraBuilder IsNAfter(string other, int pos) => IsNBefore(other, pos, true);
 
         private ZebraBuilder IsNBefore(string other, int n, bool reverse)
@@ -74,14 +74,14 @@ public partial class ZebraBuilder
         private ZebraBuilder AddAndClose(IConstraint<int> constraint)
         {
             if (!CheckForDuplicates(constraint)) return _builder;
-            
+
             var conflictingConstraint = CheckForConflicts(constraint);
             if (conflictingConstraint != null)
             {
                 throw new Exception(
                     $"Constraint conflicts with existing constraint \"{conflictingConstraint.Description}\"");
             }
-            
+
             _builder._constraints.Add(constraint);
 
             return _builder;
