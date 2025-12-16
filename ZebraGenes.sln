@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes.Runner", "src\Zebra\ZebraGenes.Runner.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes.Runner", "src\ZebraGenes.Runner\ZebraGenes.Runner.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}"
 EndProject
