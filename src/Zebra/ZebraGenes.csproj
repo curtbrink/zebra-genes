@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Csp\Csp.csproj" />
       <ProjectReference Include="..\Generator.Zebra\Generator.Zebra.csproj" />
     </ItemGroup>
     

@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Csp\Csp.csproj" />
+      <ProjectReference Include="..\..\src\Csp.Puzzles.Polyomino\Csp.Puzzles.Polyomino.csproj" />
     </ItemGroup>
 
 </Project>

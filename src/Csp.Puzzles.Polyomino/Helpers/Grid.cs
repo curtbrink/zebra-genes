@@ -1,4 +1,4 @@
-namespace Csp.Helpers;
+namespace Csp.Puzzles.Polyomino.Helpers;
 
 public class Grid
 {

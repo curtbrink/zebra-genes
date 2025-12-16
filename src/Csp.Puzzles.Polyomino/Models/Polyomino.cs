@@ -1,6 +1,6 @@
-using Csp.Helpers;
+using Csp.Puzzles.Polyomino.Helpers;
 
-namespace Csp.Types.Polyomino;
+namespace Csp.Puzzles.Polyomino.Models;
 
 public class Polyomino
 {
