@@ -9,5 +9,5 @@ public interface IMutableDomainStore<T> : IDomainStore<T>
     
     public void SetMutableDomain(IVariable variable, IMutableDomain<T> domain);
 
-    public IDictionary<IVariable, IMutableDomain<T>> GetAllDomains();
+    public new IDictionary<IVariable, IMutableDomain<T>> GetAllDomains();
 }
