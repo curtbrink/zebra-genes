@@ -6,4 +6,6 @@ namespace Csp.Core.Models.Models.Domain;
 public class DomainStore<T>(IDictionary<IVariable, IDomain<T>> domains) : IDomainStore<T>
 {
     public IDomain<T> GetDomain(IVariable variable) => domains[variable];
+    
+    public IDictionary<IVariable, IDomain<T>> GetAllDomains() => domains;
 }
