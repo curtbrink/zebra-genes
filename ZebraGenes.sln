@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes", "src\Zebra\ZebraGenes.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebraGenes.Runner", "src\Zebra\ZebraGenes.Runner.csproj", "{393DFF30-4A2E-49EF-9D14-51CD18EA9639}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}"
 EndProject
@@ -39,6 +39,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp.Puzzles.Selfref.Tests", "test\Csp.Puzzles.Selfref.Tests\Csp.Puzzles.Selfref.Tests.csproj", "{A0883A53-02DA-4D78-9B4B-073841A4943E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csp.Puzzles.Polyomino.Tests", "test\Csp.Puzzles.Polyomino.Tests\Csp.Puzzles.Polyomino.Tests.csproj", "{DB10FA1F-C2D2-48F2-8C05-8C3396E8F039}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runner", "Runner", "{C35DD741-D5B8-4FDA-9AFD-8EB1C0315814}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,5 +126,6 @@ Global
 		{94C30C5F-C6AC-4137-A78C-46E689BC2188} = {C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}
 		{A0883A53-02DA-4D78-9B4B-073841A4943E} = {C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}
 		{DB10FA1F-C2D2-48F2-8C05-8C3396E8F039} = {C7A14326-A9B1-4FBC-8259-D25EFB1AF4AA}
+		{393DFF30-4A2E-49EF-9D14-51CD18EA9639} = {C35DD741-D5B8-4FDA-9AFD-8EB1C0315814}
 	EndGlobalSection
 EndGlobal

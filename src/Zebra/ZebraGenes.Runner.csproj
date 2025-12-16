@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <PackageId>ZebraGenes.Runner</PackageId>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes console runner that can run any puzzle type.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Csp.Core.Solvers\Csp.Core.Solvers.csproj" />
+      <ProjectReference Include="..\Csp.Puzzles.Akari\Csp.Puzzles.Akari.csproj" />
+      <ProjectReference Include="..\Csp.Puzzles.Polyomino\Csp.Puzzles.Polyomino.csproj" />
+      <ProjectReference Include="..\Csp.Puzzles.Selfref\Csp.Puzzles.Selfref.csproj" />
+      <ProjectReference Include="..\Csp.Puzzles.Sudoku\Csp.Puzzles.Sudoku.csproj" />
+      <ProjectReference Include="..\Generator.Zebra\Generator.Zebra.csproj" />
+    </ItemGroup>
+    
+</Project>
