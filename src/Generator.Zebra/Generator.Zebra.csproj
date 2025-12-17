@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageId>ZebraGenes.Generator.Zebra</PackageId>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes Generator for Zebra puzzles.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Csp.Puzzles.Zebra\Csp.Puzzles.Zebra.csproj" />
+    </ItemGroup>
+
+</Project>

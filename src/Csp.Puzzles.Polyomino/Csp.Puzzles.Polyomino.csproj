@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageId>ZebraGenes.Csp.Puzzles.Polyomino</PackageId>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes component that contains Polyomino-puzzle-specific CSP constraints, as well as a builder class for
+            creating Polyomino puzzle CSP encodings via a fluent-style builder API.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Csp.Core.Models\Csp.Core.Models.csproj" />
+    </ItemGroup>
+
+</Project>

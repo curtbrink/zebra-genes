@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageId>ZebraGenes.Csp.Core.Models</PackageId>
+        <Authors>curtbrink</Authors>
+        <Description>
+            ZebraGenes component that contains generic CSP models.
+        </Description>
+    </PropertyGroup>
+    
+</Project>
