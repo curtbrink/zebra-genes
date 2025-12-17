@@ -15,19 +15,16 @@ public class BacktrackSolver<T>(ILogger<BacktrackSolver<T>> logger, IInferenceSo
     public SolveResult<T> Solve(ICsp<T> csp)
     {
         var domainStore = new MutableDomainStore<T>(csp.Domains);
-
+        
         try
         {
-            Recurse(csp, domainStore);
+            return Recurse(csp, domainStore);
         }
         catch (ContradictionException ce)
         {
             logger.LogDebug("BacktrackSolver threw a ContradictionException: {CeMessage}", ce.Message);
             return new SolveResult<T>(SolveStatus.NotSatisfied, ce.Message, null);
         }
-        
-        // check solve status
-        return GenerateResult(domainStore);
     }
     
     public SolveResult<T> Recurse(ICsp<T> csp, IMutableDomainStore<T> domainStore)
