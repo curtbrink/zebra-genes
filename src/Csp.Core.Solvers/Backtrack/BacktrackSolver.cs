@@ -79,7 +79,7 @@ public class BacktrackSolver<T>(ILogger<BacktrackSolver<T>> logger, IInferenceSo
             catch (ContradictionException ce)
             {
                 // our hypothetical partial solution didn't yield any full solutions.
-                Console.WriteLine(ce.Message);
+                logger.LogDebug(ce.Message);
             }
         }
         
