@@ -5,8 +5,8 @@ namespace Csp.Puzzles.Polyomino.Models;
 public class Polyomino
 {
     public string Id { get; init; }
+    public int TileCount { get; }
     public Grid Definition => _gridDefinition;
-    public int TileCount => BuildPlacementFromGrid(_gridDefinition.GetGrid()).Count;
     public List<List<(int x, int y)>> PossiblePlacements => _allPlacements;
     
     private readonly Grid _gridDefinition;
@@ -17,6 +17,7 @@ public class Polyomino
         Id = typeId;
         _gridDefinition = new Grid(gridDefinition, '#');
         _allPlacements = BuildAllPlacements(_gridDefinition);
+        TileCount = _allPlacements[0].Count;
     }
 
     private static List<List<(int x, int y)>> BuildAllPlacements(Grid grid)

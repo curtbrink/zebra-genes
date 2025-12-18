@@ -99,5 +99,12 @@ public class Grid
 
         return s;
     }
+    
+}
 
+public static class GridExtensions
+{
+    public static List<(int x, int y)> GetOrthogonalNeighbors(this bool[,] grid, int x, int y) =>
+        new List<(int x, int y)> { (x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y) }.Where(c =>
+            c.x >= 0 && c.x < grid.GetLength(1) && c.y >= 0 && c.y < grid.GetLength(0)).ToList();
 }

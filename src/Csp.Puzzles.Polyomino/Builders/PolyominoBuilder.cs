@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Csp.Core.Models.Models.Constraint.Interfaces;
 using Csp.Core.Models.Models.Csp;
 using Csp.Core.Models.Models.Csp.Interfaces;
 using Csp.Core.Models.Models.Domain;
@@ -37,12 +38,22 @@ public class PolyominoBuilder
     {
         var variables = new List<PolyominoVariable>();
         var domains = new Dictionary<Models.Polyomino, List<Placement>>();
+        var constraints = new List<IConstraint<Placement>>();
         foreach (var p in _polyominos)
         {
+            var pVars = new List<PolyominoVariable>();
             for (var i = 0; i < _polyominoQuotas[p]; i++)
             {
-                variables.Add(new PolyominoVariable($"{i}", p));
+                pVars.Add(new PolyominoVariable($"{i}", p));
             }
+
+            for (var i = 0; i < pVars.Count - 1; i++)
+            {
+                var constraint = new SymmetryBreakingLexicographicOrderConstraint(pVars[i], pVars[i + 1]);
+                constraints.Add(constraint);
+            }
+
+            variables.AddRange(pVars);
 
             // find domain
             domains[p] = [];
@@ -87,7 +98,9 @@ public class PolyominoBuilder
         }
 
         var readonlyDict = new ReadOnlyDictionary<IVariable, IDomain<Placement>>(builtDomains);
+        
+        constraints.Add(new NoOverlapConstraint(variables));
 
-        return new BaseCsp<Placement>(variables, readonlyDict, [new NoOverlapConstraint(variables)]);
+        return new BaseCsp<Placement>(variables, readonlyDict, constraints);
     }
 }

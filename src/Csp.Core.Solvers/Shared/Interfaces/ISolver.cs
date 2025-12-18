@@ -5,5 +5,5 @@ namespace Csp.Core.Solvers.Shared.Interfaces;
 
 public interface ISolver<T>
 {
-    public SolveResult<T> Solve(ICsp<T> csp);
+    public SolveResult<T> Solve(ICsp<T> csp, ISearchState<T>? searchState = null);
 }

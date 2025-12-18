@@ -16,7 +16,7 @@ public class GacSolver<T>(ILogger<GacSolver<T>> logger) : BaseSolver<T>, IInfere
     // Arc consistency runner.
     //    ...GAC is pretty goated, if a bit computationally expensive. With the sauce, even.
     
-    public SolveResult<T> Solve(ICsp<T> csp)
+    public SolveResult<T> Solve(ICsp<T> csp, ISearchState<T>? searchState)
     {
         var domainStore = new MutableDomainStore<T>(csp.Domains);
 

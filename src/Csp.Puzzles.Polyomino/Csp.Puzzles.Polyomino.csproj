@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Csp.Core.Models\Csp.Core.Models.csproj" />
+        <ProjectReference Include="..\Csp.Core.Solvers\Csp.Core.Solvers.csproj" />
     </ItemGroup>
 
 </Project>
